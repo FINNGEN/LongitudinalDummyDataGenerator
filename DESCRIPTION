@@ -1,0 +1,17 @@
+Package: LongitudinalDummyDataGenerator
+Title: Longitudinal Dummy Data Generator
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Javier",
+           family = "Gracia-Tabuenca",
+           role = c("aut", "cre"),
+           email = "javier.graciatabuenca@tuni.fi",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Creates Longitudinal Dummy data from summary
+    statiscics
+License: none
+Encoding: UTF-8
+Language: en
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
