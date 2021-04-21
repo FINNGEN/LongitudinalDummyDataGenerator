@@ -19,4 +19,6 @@ usethis::use_description(
 usethis::use_readme_md()
 
 
-#usethis::use_git()
+usethis::use_git()
+
+
