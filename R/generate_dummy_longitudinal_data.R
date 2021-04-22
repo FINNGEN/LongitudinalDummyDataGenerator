@@ -101,7 +101,7 @@ generate_dummy_longitudinal_data<-function(
   ParallelLogger::stopCluster(cluster)
   ParallelLogger::unregisterLogger(logger)
 
-  return(longitudinal_data)
+ ## return(longitudinal_data)
 
 }
 
