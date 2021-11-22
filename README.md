@@ -10,8 +10,13 @@ remotes::install_github("FINNGEN/LongitudinalDummyDataGenerator")
 ```
 ## Run
 ``` r
-install.packages("remotes")
-remotes::install_github("FINNGEN/LongitudinalDummyDataGenerator")
+LongitudinalDummyDataGenerator::generate_dummy_longitudinal_data(
+    output_folder = tempdir(), # directory where to ouput the data 
+    longitudinal_data_version = "DF6v2", #at the moment only DF6v2 is avalilable
+    n_patients = 100, # number of random patients to genenrate 
+    seed = 13, # seed used in the random processes 
+    nTreaths = 3 # number of cores to use when using paraller generation (if large you can use parallel::detectCores() -1)
+)
 ```
 
 
