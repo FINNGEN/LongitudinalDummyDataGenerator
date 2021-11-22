@@ -2,20 +2,28 @@
 
 
 
-#' Title
+#' generate_dummy_longitudinal_data
 #'
-#' @param output_folder
-#' @param longitudinal_data_version
-#' @param n_patients
-#' @param seed
-#' @param nTreaths
+#' Produces longituinal and baseline data in folder `output_folder` for `n_patients` number of patietns
+#'
+#' @param output_folder directory where to output the generated data
+#' @param longitudinal_data_version at the moment only DF6v2 is avalilable
+#' @param n_patients number of random patients to genenrate
+#' @param seed seed used in the random processes
+#' @param nTreaths number of cores to use when using paraller generation (if large you can use parallel::detectCores() -1)
 #'
 #' @return
 #' @export
 #'
-#' @examples
+#'
 #' @importFrom ParallelLogger createLogger createFileAppender layoutTimestamp registerLogger logInfo makeCluster clusterRequire clusterApply stopCluster unregisterLogger
+#' @importFrom tibble tibble
+#' @importFrom dplyr count mutate select row_number group_by bind_rows distinct left_join rename
+#' @importFrom tidyr nest
+#' @importFrom readr write_tsv
+#' @importFrom stringr str_c
 #' @importFrom scales number
+#'
 generate_dummy_longitudinal_data<-function(
   output_folder,
   longitudinal_data_version="DF6v2",
@@ -109,7 +117,13 @@ generate_dummy_longitudinal_data<-function(
 
 
 
+
 #' @importFrom ParallelLogger logInfo
+#' @importFrom dplyr mutate select starts_with filter left_join transmute group_by ungroup distinct if_else row_number bind_rows count group_modify rename case_when arrange
+#' @importFrom tidyr expand_grid nest unnest gather
+#' @importFrom tibble tibble
+#' @importFrom stringr str_c str_pad
+#' @importFrom purrr pmap_dbl map2 pmap map_int map
 #' @importFrom scales number
 #' @importFrom lubridate interval
 .generate_dummy_longitudinal_data<-function(
@@ -551,6 +565,7 @@ generate_dummy_longitudinal_data<-function(
 
 
 
+#' @importFrom tibble tibble
 .bins_to_tibble <- function(bin_lable, n_events){
   out <- tibble::tibble(ne=as.integer(n_events), code=as.integer(NA))
   if(is.na(bin_lable)){return(out)}
@@ -574,6 +589,7 @@ generate_dummy_longitudinal_data<-function(
 }
 
 
+#' @importFrom dplyr enquo mutate
 .uncount_prob <- function(tb, probabilities_table, col_name ){
   col_name <- dplyr::enquo(col_name)
   a <- probabilities_table
@@ -581,6 +597,7 @@ generate_dummy_longitudinal_data<-function(
   return(tb %>% dplyr::mutate(!!col_name:=b))
 }
 
+#' @importFrom dplyr slice
 .sample_probability_tibble <- function(data, per_column, n_samples){
   ret <- data %>% dplyr::slice(0)
   if(nrow(data)!=0){
