@@ -53,5 +53,5 @@ LongitudinalDummyDataGenerator::generate_dummy_longitudinal_data(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of LongitudinalDummyDataGenerator is to ...
+The goal of LongitudinalDummyDataGenerator is to ..
 
