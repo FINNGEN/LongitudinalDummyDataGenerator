@@ -138,7 +138,7 @@ generate_dummy_longitudinal_data<-function(
   #set seed
   set.seed(seed)
   # load data
-  data("summary_data_versions_list")
+  data("summary_data_versions_list", package = "LongitudinalDummyDataGenerator")
 
   summary_tables <- summary_data_versions_list[[longitudinal_data_version]]
 
