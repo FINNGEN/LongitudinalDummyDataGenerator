@@ -22,7 +22,7 @@ for(folder in summary_data_folders){
   count_periods <- read_tsv(file.path(summary_data_path, folder, "count_periods.tsv"), col_types = col_types)
   if(folder=="DF6v2"){
     # TEMP: forgot stats for DEATH, copy them from CANC at the moment
-    count_periods <-count_periods %>%  mutate(DEATH_logmean  = CANC_logmean, DEATH_logsd = CANC_logsd  )
+    count_periods <-count_periods |>  mutate(DEATH_logmean  = CANC_logmean, DEATH_logsd = CANC_logsd  )
   }
   tables_list[["count_periods"]]<-count_periods
 

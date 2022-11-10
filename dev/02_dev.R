@@ -5,7 +5,6 @@
 # Engineering
 
 ## Dependencies ----
-usethis::use_pipe()
 usethis::use_tibble()
 
 ## Add one line by package you want to add as dependency
