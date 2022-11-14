@@ -22,3 +22,6 @@ usethis::use_readme_md()
 usethis::use_git()
 
 
+renv::init()
+
+
