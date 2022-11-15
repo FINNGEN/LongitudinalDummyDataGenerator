@@ -10,8 +10,8 @@
 
 
 # PARAMETERS --------------------------------------------------------------
-n_patients_limit = 1
-path_to_service_sector_data <- "../data_mnt/ss_sample.tsv"
+n_patients_limit = 5
+  path_to_service_sector_data <- "../data_mnt/finngen_R10_service_sector_detailed_longitudinal_1.0.txt"
 output_folder = "../data_mnt/summary_data/"
 
 
@@ -36,8 +36,9 @@ col_types <- readr::cols(
 service_sector_data <- readr::read_tsv(path_to_service_sector_data, col_types = col_types)
 
 
+
 # SETUP -------------------------------------------------------------------
-logger <- log4r::create.logger()
+logger <- log4r::logger(appenders = log4r::file_appender(file.path(output_folder, "service_sector_data_to_summary.log")))
 
 remove_n_patients_limit <- function(data, data_name, logger, n_patients_limit){
   n_codes_count <- data |>  nrow()
@@ -49,8 +50,8 @@ remove_n_patients_limit <- function(data, data_name, logger, n_patients_limit){
 
   log4r::info(logger, data_name, ": ",
               "n unique codes", n_codes_count,
-              "n unique codes more than 5 patients", n5_codes_count,
-              "percent unique codes lost", {percent(1-n5_codes_count/n_codes_count, accuracy=0.01)})
+              "n unique codes more than 5 patients ", n_codes_count_allowed,
+              "percent unique codes lost ", {scales::percent(1-n_codes_count_allowed/n_codes_count, accuracy=0.01)})
 
   return(data)
 }
@@ -69,7 +70,7 @@ service_sector_data <- service_sector_data |>
       SOURCE == "REIMB" ~ ICDVER,
       SOURCE == "PURCH" ~ "purch",
       SOURCE == "CANC" ~ "canc",
-      SOURCE == "DEATH" ~ "death"
+      SOURCE == "DEATH" ~ ICDVER
       ),
     level = dplyr::case_when(
       SOURCE %in% c("INPAT", "OUTPAT") ~ stringr::str_extract(CATEGORY, "[:digit:]+$") |> stringr::str_replace_na(""),
@@ -147,8 +148,8 @@ observation_periods_summary <- remove_n_patients_limit(observation_periods_summa
 
 ### save file
 log4r::info(logger, "save observation_periods_summary table ")
-
 observation_periods_summary |> readr::write_tsv(file.path(output_folder, "observation_periods_summary_summary.tsv"))
+rm(observation_periods_summary)
 
 
 
@@ -157,6 +158,7 @@ log4r::info(logger, "Calculate visits_summary")
 
 visit_year_cuts <-  c(0, 1986, 1995, 2002, 2010, 2018, 2100)
 
+tictoc::tic()
 count_visits_per_patient <- service_sector_data |>
   # ignore CODE5 and CODE6 for PURCH : reimbursement in euros
   # ignore CODE7 for all except PRIM_OUT: hospital-type
@@ -175,7 +177,7 @@ count_visits_per_patient <- service_sector_data |>
     n_events_per_visit_logmean = mean(log(n+0.5)), n_events_per_visit_logsd = sd(log(n+0.5)),
     n_patients = length(unique(FINNGENID)),
     .groups="drop")
-
+tictoc::toc()
 
 ### remove counts under limit
 count_visits_per_patient <- remove_n_patients_limit(count_visits_per_patient, "count_visits_per_patient", logger, n_patients_limit)
