@@ -1,36 +1,29 @@
-
-
-
-
-#' generate_dummy_longitudinal_data
-#'
-#' Produces longituinal and baseline data in folder `output_folder` for `n_patients` number of patietns
-#'
+#' @title generate_dummy_service_sector_data
+#' @description Generates a file with dummy data in the service sector format.
 #' @param output_folder directory where to output the generated data
-#' @param longitudinal_data_version at the moment only DF6v2 is avalilable
-#' @param n_patients number of random patients to genenrate
-#' @param seed seed used in the random processes
-#' @param nTreaths number of cores to use when using paraller generation (if large you can use parallel::detectCores() -1)
-#'
-#' @return
+#' @param service_sector_data_version at the moment only DF6v2 is available, Default: 'R10v2'
+#' @param n_patients number of random patients to generate, Default: 30
+#' @param n_cuts PARAM_DESCRIPTION, Default: 3
+#' @param seed seed used in the random processes, Default: 13
+#' @param nTreaths number of cores to use when using parallel generation, Default: (parallel::detectCores() -1)
+#' @return OUTPUT_DESCRIPTION
+#' @rdname generate_dummy_service_sector_data
 #' @export
-#'
-#'
 #' @importFrom ParallelLogger createLogger createFileAppender layoutTimestamp registerLogger logInfo makeCluster clusterRequire clusterApply stopCluster unregisterLogger
 #' @importFrom tibble tibble
-#' @importFrom dplyr count mutate select row_number group_by bind_rows distinct left_join rename
+#' @importFrom dplyr count mutate select row_number group_by pull bind_rows distinct left_join rename
+#' @importFrom slider slide_int
 #' @importFrom tidyr nest
 #' @importFrom readr write_tsv
 #' @importFrom stringr str_c
 #' @importFrom scales number
-#'
-generate_dummy_longitudinal_data<-function(
+generate_dummy_service_sector_data<-function(
     output_folder,
-    longitudinal_data_version="R10v1",
-    n_patients=300,
+    service_sector_data_version="R10v2",
+    n_patients=30,
     n_cuts=3,
     seed=13,
-    nTreaths=2
+    nTreaths=(parallel::detectCores() -2)
 ){
 
 
@@ -82,62 +75,69 @@ generate_dummy_longitudinal_data<-function(
   res <- ParallelLogger::clusterApply(
     cluster = cluster,
     x = par_parameters,
-    longitudinal_data_version = longitudinal_data_version,
-    fun = .generate_dummy_longitudinal_data
+    service_sector_data_version = service_sector_data_version,
+    fun = .generate_dummy_service_sector_data
   )
 
   ### JOIN restuls from parallel
   ParallelLogger::logInfo("Join resuls")
-  res <- res |> dplyr::bind_rows()
-  longitudinal_data <- res$longitudinal_data |> dplyr::bind_rows()
-  baseline_data <- res$baseline_data |> dplyr::bind_rows()
+  service_sector_data <- res |> dplyr::bind_rows()
 
   # doing parallel some indexes repeat for different patient: re calculate index
-  unique_index <- longitudinal_data |> dplyr::distinct(FINNGENID, INDEX) |> dplyr::mutate(i=dplyr::row_number())
-  longitudinal_data <- dplyr::left_join(
-    longitudinal_data,
+  unique_index <- service_sector_data |>
+    dplyr::distinct(FINNGENID, INDEX) |>
+    dplyr::mutate(i=dplyr::row_number())
+
+  service_sector_data <- dplyr::left_join(
+    service_sector_data,
     unique_index,
     by = c("FINNGENID", "INDEX")
   ) |> dplyr::select(-INDEX) |> dplyr::rename(INDEX=i)
 
   ## SAVE
-  ParallelLogger::logInfo("Save longitudinal_data")
-  longitudinal_data |>
-    readr::write_tsv(file.path(output_folder, stringr::str_c("longitudinal_dummy_data_", scales::number(n_patients, scale = 0.001, suffix = "k"), "_", seed, ".tsv" )))
-  ParallelLogger::logInfo("Saved longitudinal_data")
-
-
-  ParallelLogger::logInfo("Save baseline_data")
-  baseline_data |>
-    readr::write_tsv(file.path(output_folder, stringr::str_c("baseline_dummy_data_", scales::number(n_patients, scale = 0.001, suffix = "k"), "_", seed, ".tsv" )))
-  ParallelLogger::logInfo("Save baseline_data")
-
+  ParallelLogger::logInfo("Save service_sector_data")
+  service_sector_data |>
+    readr::write_tsv(
+      file.path(output_folder, stringr::str_c("longitudinal_dummy_data_", scales::number(n_patients, scale = 0.001, suffix = "k"), "_", seed, ".tsv" )),
+      na = ""
+      )
+  ParallelLogger::logInfo("Saved service_sector_data")
 
   ParallelLogger::stopCluster(cluster)
   ParallelLogger::unregisterLogger(logger)
 
-  ## return(longitudinal_data)
+  ## return(service_sector_data)
 
 }
 
 
 
 
+
+#' @title .generate_dummy_service_sector_data
+#' @description Create a tibble with dummy data in the service sector format.
+#' This function is ran in parallel by function generate_dummy_service_sector_data.
+#' @param par_parameters PARAM_DESCRIPTION, Default: list(n_patients = 30, n_patients_offset = 0, seed = 13)
+#' @param service_sector_data_version PARAM_DESCRIPTION, Default: 'R10v2'
+#' @return OUTPUT_DESCRIPTION
+#'
+#' @rdname .generate_dummy_service_sector_data
+#' @export
 #' @importFrom ParallelLogger logInfo
-#' @importFrom dplyr mutate select starts_with filter left_join transmute group_by ungroup distinct if_else row_number bind_rows count group_modify rename case_when arrange
-#' @importFrom tidyr expand_grid nest unnest gather
+#' @importFrom dplyr mutate select starts_with row_number left_join transmute n group_by ungroup distinct if_else filter bind_cols sample_n arrange case_when semi_join bind_rows
+#' @importFrom tidyr expand_grid nest unnest gather uncount
 #' @importFrom tibble tibble
-#' @importFrom stringr str_c str_pad
-#' @importFrom purrr pmap_dbl map2 pmap map_int map
+#' @importFrom stringr str_c str_pad str_extract str_remove str_replace_na
+#' @importFrom purrr pmap_dbl map2 pmap map_int
 #' @importFrom scales number
-#' @importFrom lubridate interval
-.generate_dummy_longitudinal_data<-function(
+#' @importFrom lubridate days year interval
+.generate_dummy_service_sector_data<-function(
     par_parameters = list(
       n_patients = 30,
       n_patients_offset = 0,
       seed = 13
     ),
-    longitudinal_data_version = "R10v2"
+    service_sector_data_version = "R10v2"
 ){
 
   n_patients <- par_parameters$n_patients
@@ -149,7 +149,7 @@ generate_dummy_longitudinal_data<-function(
   # load data
   data("summary_data_versions_list", package = "LongitudinalDummyDataGenerator")
 
-  summary_tables <- summary_data_versions_list[[longitudinal_data_version]]
+  summary_tables <- summary_data_versions_list[[service_sector_data_version]]
 
 
   ###
@@ -167,7 +167,7 @@ generate_dummy_longitudinal_data<-function(
     dplyr::mutate(
       per_patients = n_patients / sum(n_patients),
       per_death = n_person_death / n_patients
-      ) |>
+    ) |>
     dplyr::select(-n_patients, -n_person_death) |>
     # expand 5 year groups to 1 years
     tidyr::expand_grid(range1=0:4) |> dplyr::mutate(first_visit_year = first_visit_year + range1, per_patients= per_patients/5) |>
@@ -311,7 +311,7 @@ generate_dummy_longitudinal_data<-function(
   ###
   ### Append codes to each event based on vocabulary
   ###
- ParallelLogger::logInfo("Append codes to each event based on vocabulary ")
+  ParallelLogger::logInfo("Append codes to each event based on vocabulary ")
 
   # Calculate probability of CODEx gruped by  SOURCE and VOCAB
   codes_probabilities <- summary_tables$service_sector$CODE1_CODE2_CODE3_vocabulary |>
@@ -339,14 +339,14 @@ generate_dummy_longitudinal_data<-function(
     tidyr::unnest(data) |>
     dplyr::ungroup()
   #
-  ParallelLogger::logInfo("Appened CODE1, CODE2, CODE3 to longitudinal_data ", scales::number(sampled_events |> nrow()), " events")
+  ParallelLogger::logInfo("Appened CODE1, CODE2, CODE3 to service_sector_data ", scales::number(sampled_events |> nrow()), " events")
 
   ###
   ### Append CODE4 to each event
   ###
   ParallelLogger::logInfo("Append CODE4 to each event")
 
-   # Calculate probability of CODE4 gruped by  SOURCE
+  # Calculate probability of CODE4 gruped by  SOURCE
   code4_probabilities <- summary_tables$service_sector$CODE4 |>
     dplyr::mutate(
       n_events_nested = purrr::map2(.x=CODE4, .y=n_events, .f=.bins_to_tibble
@@ -383,71 +383,70 @@ generate_dummy_longitudinal_data<-function(
     dplyr::ungroup()
 
 
-    #
-    ParallelLogger::logInfo("Appened CODE4 to longitudinal_data ", scales::number(sampled_events |> nrow()), " events")
+  #
+  ParallelLogger::logInfo("Appened CODE4 to service_sector_data ", scales::number(sampled_events |> nrow()), " events")
 
 
-    ###
-    ### Reformat data as in source files
-    ###
-    ## longitudinal data
+  ###
+  ### Reformat data as in source files
+  ###
+  ## longitudinal data
 
-    ParallelLogger::logInfo("Reformat data as in source files ")
-    #
-    sampled_codes <-  sampled_codes|>
-      # Re build CATEGORY and IDCVER
-      dplyr::mutate(ICDVER=dplyr::case_when(
-        SOURCE %in% c("INPAT", "OUTPAT", "REIMB") ~ stringr::str_extract(vocabulary, "[:digit:]+"),
-        TRUE ~ as.character(NA)
-      ))|>
-      dplyr::mutate(CATEGORY=dplyr::case_when(
-        SOURCE %in% c("PRIM_OUT", "OPER_IN", "OPER_OUT") ~ stringr::str_c(vocabulary, level),
-        SOURCE %in% c("INPAT", "OUTPAT") ~  stringr::str_extract(vocabulary, "[:upper:]+") |>
-          stringr::str_replace_na("") |> stringr::str_c(level),
-        TRUE ~ as.character(NA)
-      )) |>
-      dplyr::select(-vocabulary, -level)
-
-
-    # replace EVENT_YEAR  with APPREX_EVENT_DAYS. It has to be calculated for EVENT_YEAR within visit (same INDEX, SOURCE )
-    ParallelLogger::logInfo("Reformat longitudinal data: replace EVENT_YEAR  with APPREX_EVENT_DAYS ")
-    #
-    distinct_event_years <-  sampled_codes|>
-      dplyr::distinct(SOURCE, INDEX, event_year )|>
-      dplyr::group_by(event_year )|> tidyr::nest()|>
-      dplyr::mutate(data = purrr::map2(.x=data, .y=event_year, .f=~{
-        .x|> dplyr::mutate(APPROX_EVENT_DAY = sample(
-          seq(as.Date(stringr::str_c(.y,'/01/01')), as.Date(stringr::str_c(.y,'/12/31')), by="day"),
-          nrow(.x),
-          replace = TRUE)
-        )
-      }))|> tidyr::unnest(data)|>  dplyr::ungroup()
-
-    sampled_codes <- dplyr::left_join(
-      sampled_codes,
-      distinct_event_years,
-      by=c("event_year", "SOURCE","INDEX")
-    ) |>
-      dplyr::select(-event_year)
+  ParallelLogger::logInfo("Reformat data as in source files ")
+  #
+  sampled_codes <-  sampled_codes|>
+    # Re build CATEGORY and IDCVER
+    dplyr::mutate(ICDVER=dplyr::case_when(
+      SOURCE %in% c("INPAT", "OUTPAT", "REIMB") ~ stringr::str_extract(vocabulary, "[:digit:]+"),
+      TRUE ~ as.character(NA)
+    ))|>
+    dplyr::mutate(CATEGORY=dplyr::case_when(
+      SOURCE %in% c("PRIM_OUT", "OPER_IN", "OPER_OUT") ~ stringr::str_c(vocabulary, level),
+      SOURCE %in% c("INPAT", "OUTPAT") ~  stringr::str_extract(vocabulary, "[:upper:]+") |>
+        stringr::str_replace_na("") |> stringr::str_c(level),
+      TRUE ~ as.character(NA)
+    )) |>
+    dplyr::select(-vocabulary, -level)
 
 
+  # replace EVENT_YEAR  with APPREX_EVENT_DAYS. It has to be calculated for EVENT_YEAR within visit (same INDEX, SOURCE )
+  ParallelLogger::logInfo("Reformat longitudinal data: replace EVENT_YEAR  with APPREX_EVENT_DAYS ")
+  #
+  distinct_event_years <-  sampled_codes|>
+    dplyr::distinct(SOURCE, INDEX, event_year )|>
+    dplyr::group_by(event_year )|> tidyr::nest()|>
+    dplyr::mutate(data = purrr::map2(.x=data, .y=event_year, .f=~{
+      .x|> dplyr::mutate(APPROX_EVENT_DAY = sample(
+        seq(as.Date(stringr::str_c(.y,'/01/01')), as.Date(stringr::str_c(.y,'/12/31')), by="day"),
+        nrow(.x),
+        replace = TRUE)
+      )
+    }))|> tidyr::unnest(data)|>  dplyr::ungroup()
+
+  sampled_codes <- dplyr::left_join(
+    sampled_codes,
+    distinct_event_years,
+    by=c("event_year", "SOURCE","INDEX")
+  ) |>
+    dplyr::select(-event_year)
 
 
-    ###
-    ### calculate death
-    ###
-    ParallelLogger::logInfo("Calculate death events")
 
 
+  ###
+  ### calculate death
+  ###
+  ParallelLogger::logInfo("Calculate death events")
+
+  if(nrow(sampled_patients |> dplyr::filter(is_death))){
     death_patients <- sampled_codes |>
-      dplyr::semi_join(sampled_patients |>
-      dplyr::filter(is_death), by="FINNGENID") |>
+      dplyr::semi_join(sampled_patients |> dplyr::filter(is_death), by="FINNGENID") |>
       dplyr::arrange(desc(APPROX_EVENT_DAY)) |>
       dplyr::distinct(FINNGENID, .keep_all = T) |>
       dplyr::transmute(
         FINNGENID = FINNGENID,
         SOURCE = "DEATH",
-        APPROX_EVENT_DAY = APPROX_EVENT_DAY+lubridate::days(sample(0:30,n())),
+        APPROX_EVENT_DAY = APPROX_EVENT_DAY+lubridate::days(sample(0:30,dplyr::n())),
         CODE4 = as.integer(NA),
         CODE5 = as.character(NA),
         CODE6 = as.character(NA),
@@ -474,7 +473,7 @@ generate_dummy_longitudinal_data<-function(
           CATAEGORY==4~"c4",
           CATAEGORY==5~"I",
           CATAEGORY==0~"U",
-        TRUE ~ as.character(NA)
+          TRUE ~ as.character(NA)
         )) |>
       # find code
       dplyr::group_by(SOURCE, vocabulary) |>
@@ -492,23 +491,28 @@ generate_dummy_longitudinal_data<-function(
       dplyr::ungroup()|>
       dplyr::select(-n_events, -codes, -vocabulary, -event_year)
 
+  }else{
+    death_patients <- sampled_codes |> dplyr::filter(FALSE)
+  }
 
-    ###
-    ### bind longitudinal and death
-    ###
-    ParallelLogger::logInfo("bind longitudinal and death")
 
-    service_sector_data <- bind_rows(
-      sampled_codes,
-      death_patients |>  sample_n(round(nrow(death_patients)*0.9))
-    )
+  ###
+  ### bind longitudinal and death
+  ###
+  ParallelLogger::logInfo("bind longitudinal and death")
+
+  service_sector_data <- dplyr::bind_rows(
+    sampled_codes,
+    death_patients |>  dplyr::sample_n(round(nrow(death_patients)*0.9))
+  )
 
 
   # calcualte EVENT_AGE
   ParallelLogger::logInfo("Reformat longitudinal data: calcualte EVENT_AGE ")
   #
   service_sector_data <-  service_sector_data|>
-    dplyr::left_join(sampled_patients|> dplyr::select(FINNGENID, birth_date), by="FINNGENID")|>
+    dplyr::left_join(sampled_patients|>
+                       dplyr::select(FINNGENID, birth_date), by="FINNGENID")|>
     dplyr::mutate(EVENT_AGE = as.numeric(lubridate::interval(birth_date, APPROX_EVENT_DAY),"years"))|>
     dplyr::mutate(EVENT_AGE = round(EVENT_AGE, digits = 2))|>
     #
@@ -517,7 +521,7 @@ generate_dummy_longitudinal_data<-function(
   #
   ParallelLogger::logInfo("Reformated longitudinal data: ", scales::number(length(sampled_events))," events")
 
-    return(service_sector_data)
+  return(service_sector_data)
 
 }
 

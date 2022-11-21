@@ -6,8 +6,8 @@
 \usage{
 generate_dummy_longitudinal_data(
   output_folder,
-  longitudinal_data_version = "DF6v2",
-  n_patients = 300,
+  longitudinal_data_version = "R10v1",
+  n_patients = 30,
   n_cuts = 3,
   seed = 13,
   nTreaths = 2
@@ -23,9 +23,6 @@ generate_dummy_longitudinal_data(
 \item{seed}{seed used in the random processes}
 
 \item{nTreaths}{number of cores to use when using paraller generation (if large you can use parallel::detectCores() -1)}
-}
-\value{
-
 }
 \description{
 Produces longituinal and baseline data in folder \code{output_folder} for \code{n_patients} number of patietns
