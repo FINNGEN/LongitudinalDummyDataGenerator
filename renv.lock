@@ -483,18 +483,6 @@
       "Hash": "77bd60a6157420d4ffa93b27cf6a58b8",
       "Requirements": []
     },
-    "feather": {
-      "Package": "feather",
-      "Version": "0.3.5",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Hash": "76de23891bdba419517e855ed611ad29",
-      "Requirements": [
-        "Rcpp",
-        "hms",
-        "tibble"
-      ]
-    },
     "fontawesome": {
       "Package": "fontawesome",
       "Version": "0.3.0",
@@ -862,6 +850,14 @@
         "glue",
         "rlang"
       ]
+    },
+    "log4r": {
+      "Package": "log4r",
+      "Version": "0.4.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7a498e629e9825817fee5eff22dd2cf2",
+      "Requirements": []
     },
     "lubridate": {
       "Package": "lubridate",
@@ -1447,6 +1443,20 @@
         "xtable"
       ]
     },
+    "slider": {
+      "Package": "slider",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5237bd176dc0c4dd7eb8dcdafe514de3",
+      "Requirements": [
+        "ellipsis",
+        "glue",
+        "rlang",
+        "vctrs",
+        "warp"
+      ]
+    },
     "snow": {
       "Package": "snow",
       "Version": "0.4-4",
@@ -1770,6 +1780,14 @@
         "rlang",
         "tibble"
       ]
+    },
+    "warp": {
+      "Package": "warp",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2982481615756e24e79fee95bdc95daa",
+      "Requirements": []
     },
     "whisker": {
       "Package": "whisker",

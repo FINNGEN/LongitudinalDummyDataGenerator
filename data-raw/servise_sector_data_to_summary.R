@@ -6,7 +6,9 @@
 # 3. Calculate SOURCE_VOCAB_EVENT_YEAR_summary table with: n_events per SOURCE, vocabulary, and event_year,
 # 4. Calculate CODE1_CODE2_CODE3_vocabulary_summary table with n_events per SOURCE, vocabulary and CODE1 CODE2 CODE3
 # 5. Calculate CODE4_summary table with: n_events per SOURCE, vocabulary and CODE4 values in bins
-
+#
+# NEW:
+# - updated for DF10v2: include CODE8 and CODE9 columns
 
 
 # PARAMETERS --------------------------------------------------------------

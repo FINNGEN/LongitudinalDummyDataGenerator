@@ -14,6 +14,7 @@ usethis::use_package( "readr")
 usethis::use_package( "lubridate")
 usethis::use_package( "ParallelLogger")
 usethis::use_package( "scales")
+usethis::use_package( "slider")
 
 
 

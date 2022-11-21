@@ -7,7 +7,6 @@
 #' @param seed seed used in the random processes, Default: 13
 #' @param nTreaths number of cores to use when using parallel generation, Default: (parallel::detectCores() -1)
 #' @return OUTPUT_DESCRIPTION
-#' @rdname generate_dummy_service_sector_data
 #' @export
 #' @importFrom ParallelLogger createLogger createFileAppender layoutTimestamp registerLogger logInfo makeCluster clusterRequire clusterApply stopCluster unregisterLogger
 #' @importFrom tibble tibble
@@ -121,7 +120,6 @@ generate_dummy_service_sector_data<-function(
 #' @param service_sector_data_version PARAM_DESCRIPTION, Default: 'R10v2'
 #' @return OUTPUT_DESCRIPTION
 #'
-#' @rdname .generate_dummy_service_sector_data
 #' @export
 #' @importFrom ParallelLogger logInfo
 #' @importFrom dplyr mutate select starts_with row_number left_join transmute n group_by ungroup distinct if_else filter bind_cols sample_n arrange case_when semi_join bind_rows
