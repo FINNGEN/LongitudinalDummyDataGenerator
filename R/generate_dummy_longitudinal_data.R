@@ -133,11 +133,11 @@ generate_dummy_longitudinal_data<-function(
 #' @importFrom lubridate interval
 .generate_dummy_longitudinal_data<-function(
     par_parameters = list(
-      n_patients = 300,
+      n_patients = 30,
       n_patients_offset = 0,
       seed = 13
     ),
-    longitudinal_data_version = "R10v1"
+    longitudinal_data_version = "R10v2"
 ){
 
   n_patients <- par_parameters$n_patients
@@ -178,9 +178,9 @@ generate_dummy_longitudinal_data<-function(
     dplyr::mutate(n_row = dplyr::row_number())
 
 
-  ParallelLogger::logInfo("Generate cohort_data and number of visits")
+  ParallelLogger::logInfo("Generate observation periods and number of visits")
 
-  # create n_patients with finngenid, random observation periods, and numer of events per SOURCE
+  # create n_patients with finngenid, random observation periods, and number of visits per SOURCE
   sampled_patients <- tibble::tibble(
     FINNGENID = stringr::str_c("FG", stringr::str_pad((1:n_patients)+n_patients_offset, width = 8, pad = "0")),
     n_row = sample(observation_periods_probabilities$n_row, size = n_patients, replace = TRUE, prob = observation_periods_probabilities$per_patients)
@@ -200,7 +200,8 @@ generate_dummy_longitudinal_data<-function(
       PRIM_OUT = floor(purrr::pmap_dbl(.l=list(1, PRIM_OUT_logmean, PRIM_OUT_logsd), .f=rlnorm)),
       REIMB = floor(purrr::pmap_dbl(.l=list(1, REIMB_logmean, REIMB_logsd), .f=rlnorm)),
       CANC = floor(purrr::pmap_dbl(.l=list(1, CANC_logmean, CANC_logsd), .f=rlnorm)),
-      is_death = rbinom(n(),1,per_death) == 1
+      # mark if is death at the end ob observation based on death probability
+      is_death = rbinom(dplyr::n(),1,per_death) == 1
     ) |>
     # calculate bday
     dplyr::mutate(birth_year = first_visit_year-first_visit_age) |>
@@ -214,12 +215,13 @@ generate_dummy_longitudinal_data<-function(
     })) |> tidyr::unnest(data) |>  dplyr::ungroup() |>
     dplyr::select(-birth_year)
 
-  ParallelLogger::logInfo("Created cohort_data with ", scales::number(sampled_patients |> dplyr::distinct(FINNGENID) |> nrow()), " patients")
+  ParallelLogger::logInfo("Created observation periods with ", scales::number(sampled_patients |> dplyr::distinct(FINNGENID) |> nrow()), " patients")
 
 
   ###
   ### Generate visits for each patient
   ###
+  ParallelLogger::logInfo("Generate visits for each patient")
 
   # provability of visit type + visit_year_bin in visit per SOURCE
   visit_type_probabilities <- summary_tables$service_sector$count_visits_per_patient |>
@@ -259,10 +261,11 @@ generate_dummy_longitudinal_data<-function(
 
 
   ###
-  ### Generate events for each visit
+  ### Generate events with a vocabulary for each visit
   ###
+  ParallelLogger::logInfo("Generate events for each visit")
 
-  # provability of visit type + visit_year_bin in visit per SOURCE
+  # provability of vocabulary per source type and year
   vocabulary_type_probabilities <- summary_tables$service_sector$SOURCE_VOCAB_EVENT_YEAR |>
     dplyr::group_by(SOURCE, vocabulary) |>
     dplyr::mutate(per_events = n_events/sum(n_events)) |>
@@ -270,12 +273,12 @@ generate_dummy_longitudinal_data<-function(
     dplyr::ungroup() |>
     dplyr::mutate(n_row = dplyr::row_number())
 
-  # for each patient and SOURCE generates n_visits with a n_events and visits year bin
+  # for each visit generated n_events with valid vocabulary in that time period
   sampled_events <- sampled_visits |>
-    group_by(FINNGENID, SOURCE, visit_year_bin_low, visit_year_bin_high) |>
-    mutate(n_total_events = sum(n_events)) |>
-    group_by(FINNGENID, SOURCE, visit_year_bin_low, visit_year_bin_high, n_total_events) |>
-    nest() |>
+    dplyr::group_by(FINNGENID, SOURCE, visit_year_bin_low, visit_year_bin_high) |>
+    dplyr::mutate(n_total_events = sum(n_events)) |>
+    dplyr::group_by(FINNGENID, SOURCE, visit_year_bin_low, visit_year_bin_high, n_total_events) |>
+    tidyr::nest() |>
     # For each visit calculate vocabulary for n_events based on SOURCE, and visit window
     dplyr::mutate(
       events = purrr::pmap(.l=list(SOURCE, visit_year_bin_low  , visit_year_bin_high , n_total_events ), .f=~{
@@ -286,14 +289,14 @@ generate_dummy_longitudinal_data<-function(
       })) |>
     dplyr::ungroup() |>
     # join events and visit info
-    mutate(data = map2(.x=data, .y=events, ~{
+    dplyr::mutate(data = map2(.x=data, .y=events, ~{
       n = nrow(.x)
-      bind_cols(
-        .x |> sample_n(n)|> uncount(n_events),
-        .y |> arrange(event_year)
+      dplyr::bind_cols(
+        .x |> dplyr::sample_n(n)|> tidyr::uncount(n_events),
+        .y |> dplyr::arrange(event_year)
       )
     })) |>
-    unnest(data) |>
+    tidyr::unnest(data) |>
     dplyr::select(-visit_year_bin_low, -visit_year_bin_high, -n_total_events, -events) |>
     # adjust the event_year to be the same for all the events in the same visit
     dplyr::group_by(SOURCE, INDEX) |>
@@ -306,9 +309,9 @@ generate_dummy_longitudinal_data<-function(
 
 
   ###
-  ### Append codes to each event
+  ### Append codes to each event based on vocabulary
   ###
-  # Give to each event a weighted random CODE1, CODE2, CODE3 combo based on SOURCE, VOCAB and EVENT_YEAR, using  `code_count.tsv`.
+ ParallelLogger::logInfo("Append codes to each event based on vocabulary ")
 
   # Calculate probability of CODEx gruped by  SOURCE and VOCAB
   codes_probabilities <- summary_tables$service_sector$CODE1_CODE2_CODE3_vocabulary |>
@@ -317,8 +320,8 @@ generate_dummy_longitudinal_data<-function(
     dplyr::ungroup() |>
     dplyr::select(-n_events, -n_patients)
 
-  ParallelLogger::logInfo("Append to longitudinal_data colums CODE1, CODE2, CODE3 combo based on SOURCE, VOCAB and EVENT_YEAR ")
-  #
+
+  # Give to each event a weighted random CODE1, CODE2, CODE3 combo based on SOURCE, VOCAB and EVENT_YEAR, using  `code_count.tsv`.
   sampled_codes <- sampled_events  |>
     #
     dplyr::group_by(SOURCE, vocabulary) |>
@@ -331,7 +334,7 @@ generate_dummy_longitudinal_data<-function(
         .sample_probability_tibble("per_events", ..3) |>
         dplyr::select(CODE1, CODE2, CODE3 )
     })) |>
-    dplyr::mutate(data = purrr::map2(data, codes, bind_cols)) |>
+    dplyr::mutate(data = purrr::map2(data, codes, dplyr::bind_cols)) |>
     dplyr::select(-n_events, -codes) |>
     tidyr::unnest(data) |>
     dplyr::ungroup()
@@ -341,9 +344,9 @@ generate_dummy_longitudinal_data<-function(
   ###
   ### Append CODE4 to each event
   ###
-  # Give to each event a weighted random CODE4 based on SOURCE, VOCAB and EVENT_YEAR, using  `code_count.tsv`.
+  ParallelLogger::logInfo("Append CODE4 to each event")
 
-  # Calculate probability of CODE4 gruped by  SOURCE
+   # Calculate probability of CODE4 gruped by  SOURCE
   code4_probabilities <- summary_tables$service_sector$CODE4 |>
     dplyr::mutate(
       n_events_nested = purrr::map2(.x=CODE4, .y=n_events, .f=.bins_to_tibble
@@ -358,8 +361,7 @@ generate_dummy_longitudinal_data<-function(
     dplyr::select(SOURCE, CODE4, per_events)  |>
     dplyr::ungroup()
 
-  ParallelLogger::logInfo("Append to longitudinal_data colums CODE4 based on SOURCE, VOCAB and EVENT_YEAR")
-  #
+  # Give to each event a weighted random CODE4 based on SOURCE, VOCAB and EVENT_YEAR, using  `code_count.tsv`.
   sampled_codes <- sampled_codes  |>
     #
     dplyr::group_by(SOURCE) |> tidyr::nest() |>
@@ -371,7 +373,7 @@ generate_dummy_longitudinal_data<-function(
         .sample_probability_tibble("per_events", ..2) |>
         dplyr::select(CODE4 )
     })) |>
-    dplyr::mutate(data = purrr::map2(data, code4, bind_cols)) |>
+    dplyr::mutate(data = purrr::map2(data, code4, dplyr::bind_cols)) |>
     dplyr::select(-n_events, -code4) |>
     tidyr::unnest(data) |>
     dplyr::ungroup() |>
@@ -390,7 +392,7 @@ generate_dummy_longitudinal_data<-function(
     ###
     ## longitudinal data
 
-    ParallelLogger::logInfo("Reformat longitudinal data: rename death LEVELS; Re build CATEGORY and IDCVER; ")
+    ParallelLogger::logInfo("Reformat data as in source files ")
     #
     sampled_codes <-  sampled_codes|>
       # Re build CATEGORY and IDCVER
@@ -434,11 +436,15 @@ generate_dummy_longitudinal_data<-function(
     ###
     ### calculate death
     ###
+    ParallelLogger::logInfo("Calculate death events")
+
+
     death_patients <- sampled_codes |>
-      semi_join(sampled_patients |> filter(is_death), by="FINNGENID") |>
-      arrange(desc(APPROX_EVENT_DAY)) |>
-      distinct(FINNGENID, .keep_all = T) |>
-      transmute(
+      dplyr::semi_join(sampled_patients |>
+      dplyr::filter(is_death), by="FINNGENID") |>
+      dplyr::arrange(desc(APPROX_EVENT_DAY)) |>
+      dplyr::distinct(FINNGENID, .keep_all = T) |>
+      dplyr::transmute(
         FINNGENID = FINNGENID,
         SOURCE = "DEATH",
         APPROX_EVENT_DAY = APPROX_EVENT_DAY+lubridate::days(sample(0:30,n())),
@@ -456,11 +462,11 @@ generate_dummy_longitudinal_data<-function(
         INDEX = row_number()
       ) |>
       # add levels
-      mutate(level = sample(0:5, n())) |>
-      uncount(level) |>
-      group_by(INDEX) |>
-      mutate(
-        CATAEGORY = row_number(),
+      dplyr::mutate(level = sample(0:5, dplyr::n())) |>
+      tidyr::uncount(level) |>
+      dplyr::group_by(INDEX) |>
+      dplyr::mutate(
+        CATAEGORY = dplyr::row_number(),
         CATAEGORY=dplyr::case_when(
           CATAEGORY==1~"c1",
           CATAEGORY==2~"c2",
@@ -481,17 +487,16 @@ generate_dummy_longitudinal_data<-function(
           .sample_probability_tibble("per_events", ..3) |>
           dplyr::select(CODE1, CODE2, CODE3 )
       })) |>
-      dplyr::mutate(data = purrr::map2(data, codes, bind_cols))  |>
+      dplyr::mutate(data = purrr::map2(data, codes, dplyr::bind_cols))  |>
       tidyr::unnest(data) |>
       dplyr::ungroup()|>
       dplyr::select(-n_events, -codes, -vocabulary, -event_year)
 
 
-
-
     ###
     ### bind longitudinal and death
     ###
+    ParallelLogger::logInfo("bind longitudinal and death")
 
     service_sector_data <- bind_rows(
       sampled_codes,

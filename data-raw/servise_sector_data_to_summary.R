@@ -11,7 +11,7 @@
 
 # PARAMETERS --------------------------------------------------------------
 n_patients_limit = 5
-  path_to_service_sector_data <- "../data_mnt/finngen_R10_service_sector_detailed_longitudinal_1.0.txt"
+  path_to_service_sector_data <- "../data_mnt/finngen_R10_service_sector_detailed_longitudinal_2.0.txt"
 output_folder = "../data_mnt/summary_data/"
 
 
@@ -168,10 +168,10 @@ count_visits_per_patient <- service_sector_data |>
     CODE7 = dplyr::if_else(SOURCE=="PRIM_OUT", CODE7, as.character(NA))
   ) |>
   # count events per patient per visit
-  dplyr::count(FINNGENID, SOURCE, INDEX, CODE5, CODE6, CODE7, APPROX_EVENT_DAY) |>
+  dplyr::count(FINNGENID, SOURCE, INDEX, CODE5, CODE6, CODE7, CODE8, CODE9, APPROX_EVENT_DAY) |>
   # lower APPROX_EVENT_DAY precision
   dplyr::mutate(visit_year_bin = lubridate::year(APPROX_EVENT_DAY) |> cut(visit_year_cuts) ) |>
-  dplyr::group_by(visit_year_bin, SOURCE, CODE5, CODE6, CODE7) |>
+  dplyr::group_by(visit_year_bin, SOURCE, CODE5, CODE6, CODE7, CODE8, CODE9) |>
   dplyr::summarise(
     n_visits = dplyr::n(),
     n_events_per_visit_logmean = mean(log(n+0.5)), n_events_per_visit_logsd = sd(log(n+0.5)),
