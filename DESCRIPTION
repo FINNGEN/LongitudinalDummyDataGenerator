@@ -14,18 +14,21 @@ Encoding: UTF-8
 Language: en
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1.9000
 Imports: 
-    magrittr,
     tibble,
     dplyr,
     stringr,
     readr,
-    feather,
     lubridate,
     ParallelLogger,
-    scales, 
+    scales,
     purrr,
-    tidyr
+    tidyr,
+    slider
 Depends: 
     R (>= 2.10)
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
