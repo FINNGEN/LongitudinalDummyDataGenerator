@@ -1,0 +1,38 @@
+INFO  [2022-11-14 20:18:50] Calculate observation_periods_summary
+INFO  [2022-11-14 20:21:28] observation_periods_summary: n unique codes1126n unique codes more than 5 patients 735percent unique codes lost 34.72%
+INFO  [2022-11-14 20:21:28] save observation_periods_summary table 
+INFO  [2022-11-14 20:21:28] Calculate visits_summary
+INFO  [2022-11-14 21:22:33] count_visits_per_patient: n unique codes13817n unique codes more than 5 patients 8989percent unique codes lost 34.94%
+INFO  [2022-11-14 21:22:33] save count_visits_per_patient table 
+INFO  [2022-11-14 21:22:33] Calculate SOURCE_VOCAB_EVENT_YEAR_summary
+INFO  [2022-11-14 21:24:19] SOURCE_VOCAB_EVENT_YEAR_summary: n unique codes580n unique codes more than 5 patients 529percent unique codes lost 8.79%
+INFO  [2022-11-14 21:24:19] save SOURCE_VOCAB_EVENT_YEAR_summary table 
+INFO  [2022-11-14 21:24:19] Calculate CODE1_CODE2_CODE3_vocabulary_summary
+INFO  [2022-11-14 21:25:02] observation_periods_summary_summary: n unique codes142260n unique codes more than 5 patients 81587percent unique codes lost 42.65%
+INFO  [2022-11-14 21:25:02] save CODE1_CODE2_CODE3_vocabulary_summary table 
+INFO  [2022-11-14 21:25:02] Calculate CODE4_summary
+INFO  [2022-11-14 21:25:37] CODE4_summary: n unique codes29n unique codes more than 5 patients 28percent unique codes lost 3.45%
+INFO  [2022-11-14 21:25:37] save CODE4_summary table 
+INFO  [2022-11-16 11:59:48] Calculate observation_periods_summary
+INFO  [2022-11-21 09:12:27] Calculate observation_periods_summary
+INFO  [2022-11-21 09:15:42] observation_periods_summary: n unique codes1126n unique codes more than 5 patients 735percent unique codes lost 34.72%
+INFO  [2022-11-21 09:15:42] save observation_periods_summary table 
+INFO  [2022-11-21 09:18:10] Calculate visits_summary
+INFO  [2022-11-21 11:04:13] Calculate observation_periods_summary
+INFO  [2022-11-21 11:07:19] observation_periods_summary: n unique codes1126n unique codes more than 5 patients 735percent unique codes lost 34.72%
+INFO  [2022-11-21 11:07:19] save observation_periods_summary table 
+INFO  [2022-11-21 11:07:19] Calculate visits_summary
+INFO  [2022-11-21 12:25:14] count_visits_per_patient: n unique codes18231n unique codes more than 5 patients 11415percent unique codes lost 37.39%
+INFO  [2022-11-21 12:25:14] save count_visits_per_patient table 
+INFO  [2022-11-21 12:25:14] Calculate SOURCE_VOCAB_EVENT_YEAR_summary
+INFO  [2022-11-21 12:27:50] SOURCE_VOCAB_EVENT_YEAR_summary: n unique codes582n unique codes more than 5 patients 531percent unique codes lost 8.76%
+INFO  [2022-11-21 12:27:50] save SOURCE_VOCAB_EVENT_YEAR_summary table 
+INFO  [2022-11-21 12:27:50] Calculate CODE1_CODE2_CODE3_vocabulary_summary
+INFO  [2022-11-21 12:28:46] observation_periods_summary_summary: n unique codes142260n unique codes more than 5 patients 81587percent unique codes lost 42.65%
+INFO  [2022-11-21 12:28:46] save CODE1_CODE2_CODE3_vocabulary_summary table 
+INFO  [2022-11-21 12:28:47] Calculate CODE4_summary
+INFO  [2022-11-21 12:29:33] CODE4_summary: n unique codes39n unique codes more than 5 patients 38percent unique codes lost 2.56%
+INFO  [2022-11-21 12:29:33] save CODE4_summary table 
+INFO  [2022-11-21 13:41:14] Calculate visits_summary
+INFO  [2022-11-21 14:59:57] count_visits_per_patient: n unique codes17029n unique codes more than 5 patients 11060percent unique codes lost 35.05%
+INFO  [2022-11-21 14:59:57] save count_visits_per_patient table 

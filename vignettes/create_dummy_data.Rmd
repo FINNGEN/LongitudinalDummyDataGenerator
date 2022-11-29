@@ -1,0 +1,116 @@
+---
+title: "create_dummy_data"
+output:
+  html_document: default
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, eval=FALSE }
+#library(LongitudinalDummyDataGenerator)
+devtools::load_all(".")
+```
+
+```{r}
+output_folder <- r"(C:\Users\javier\WorkSpace\FINNGEN\atlas-dev-data\dummy_data_v2\r10_v2_5k\output_dummy_generator)"
+```
+
+# Generate service sector dummy data
+
+```{r}
+service_sector_data_version = "R10v2"
+person_level_data_version="R10v1"
+n_patients_minimum <- 5000
+```
+
+
+```{r, eval=FALSE}
+tictoc::tic()
+generate_all_dummy_data_to_files(
+  output_folder = output_folder,
+  service_sector_data_version = service_sector_data_version,
+  person_level_data_version = person_level_data_version,
+  n_patients_minimum = n_patients_minimum,
+  per_patients_baseline = 0.99,
+  per_patients_covariates = 0.95,
+  per_patients_service_sector = 0.99,
+  seed = 13,
+  nTreaths=(parallel::detectCores() -2)
+)
+tictoc::toc()
+
+```
+
+# Load data
+
+```{r}
+
+file_name <- stringr::str_c("dummy_service_sector_", service_sector_data_version, ".txt" )
+service_sector_data <- readr::read_tsv(
+  file.path(output_folder, file_name), 
+  col_types = readr::cols(.default = readr::col_character()))
+
+file_name <- stringr::str_c("dummy_minimum_", person_level_data_version, ".txt" )
+minimum_data <- readr::read_tsv(file.path(output_folder, file_name))
+
+file_name <- stringr::str_c("dummy_covariates_", person_level_data_version, ".txt" )
+covariates_data <- readr::read_tsv(file.path(output_folder, file_name))
+
+file_name <- stringr::str_c("dummy_baseline_", person_level_data_version, ".txt" )
+baseline_data <- readr::read_tsv(file.path(output_folder, file_name))
+```
+
+# Assess data
+
+## Patients overlap
+
+```{r}
+library(tidyverse)
+
+bind_rows(
+  service_sector_data |> distinct(FINNGENID) |> mutate(table="service_sector"),
+  minimum_data |> distinct(FINNGENID) |> mutate(table="minimum"),
+  covariates_data |> mutate(FINNGENID=FID) |>  distinct(FINNGENID) |> mutate(table="covariates"),
+  baseline_data |> distinct(FINNGENID) |> mutate(table="baseline")
+) |> 
+  group_by(FINNGENID) |> 
+  summarise(Pathways = list(table)) |> 
+  #
+  ggplot(aes(x = Pathways)) +
+  geom_bar() +
+  ggupset::scale_x_upset()
+
+
+```
+
+## Vocabularies over time 
+
+```{r}
+service_sector_data_vocab <- service_sector_data |> 
+  mutate(
+    vocabulary = dplyr::case_when(
+      SOURCE %in% c("INPAT", "OUTPAT") ~ ICDVER,
+      SOURCE %in% c("PRIM_OUT", "OPER_IN", "OPER_OUT") ~ stringr::str_extract(CATEGORY, "^[:upper:]+"),
+      SOURCE == "REIMB" ~ ICDVER,
+      SOURCE == "PURCH" ~ "purch",
+      SOURCE == "CANC" ~ "canc",
+      SOURCE == "DEATH" ~ ICDVER
+    ), 
+    event_year = lubridate::year(APPROX_EVENT_DAY)
+  ) 
+
+```
+
+```{r}
+service_sector_data_vocab |> 
+  count(SOURCE, vocabulary, event_year) |> 
+  #
+  ggplot(aes(x=event_year, y=n, fill=vocabulary))+
+  geom_bar(stat = "identity")+
+  facet_grid(SOURCE~., scales = "free_y")
+```
