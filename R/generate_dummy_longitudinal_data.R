@@ -1,6 +1,5 @@
 #' @title generate_dummy_service_sector_data
 #' @description Generates a file with dummy data in the service sector format.
-#' @param output_folder directory where to output the generated data
 #' @param service_sector_data_version at the moment only DF6v2 is available, Default: 'R10v2'
 #' @param n_patients number of random patients to generate, Default: 30
 #' @param n_cuts PARAM_DESCRIPTION, Default: 3
@@ -17,28 +16,12 @@
 #' @importFrom stringr str_c
 #' @importFrom scales number
 generate_dummy_service_sector_data<-function(
-    output_folder,
     service_sector_data_version="R10v2",
     n_patients=30,
-    n_cuts=3,
+    n_cuts=nTreaths,
     seed=13,
     nTreaths=(parallel::detectCores() -2)
 ){
-
-
-  # prepare parallel loger
-  logger <- ParallelLogger::createLogger(
-    name = "DUMMY DATA GENERATOR",
-    threshold = "INFO",
-    appenders = list(
-      ParallelLogger::createFileAppender(
-        layout = ParallelLogger::layoutTimestamp,
-        fileName = file.path(output_folder, "generate_dummy.log.txt")
-      )
-    )
-  )
-  ParallelLogger::registerLogger(logger)
-
 
   ### SPLIT parameters for parallel
   ParallelLogger::logInfo("Break ", n_patients, " into ", n_cuts, " groups")
@@ -51,6 +34,7 @@ generate_dummy_service_sector_data<-function(
       dplyr::mutate(seed = dplyr::row_number()+seed-1)
 
     par_parameters <- par_parameters |>
+      dplyr::mutate(n_patients_offset = n_patients_offset - par_parameters$n_patients_offset[1]) |>
       dplyr::mutate(i=dplyr::row_number()) |>
       dplyr::group_by(i) |>
       tidyr::nest() |> dplyr::pull(data)
@@ -91,21 +75,13 @@ generate_dummy_service_sector_data<-function(
     service_sector_data,
     unique_index,
     by = c("FINNGENID", "INDEX")
-  ) |> dplyr::select(-INDEX) |> dplyr::rename(INDEX=i)
+  ) |> dplyr::select(-INDEX) |> dplyr::rename(INDEX=i) |>
+    dplyr::arrange(FINNGENID)
 
-  ## SAVE
-  ParallelLogger::logInfo("Save service_sector_data")
-  service_sector_data |>
-    readr::write_tsv(
-      file.path(output_folder, stringr::str_c("longitudinal_dummy_data_", scales::number(n_patients, scale = 0.001, suffix = "k"), "_", seed, ".tsv" )),
-      na = ""
-      )
-  ParallelLogger::logInfo("Saved service_sector_data")
 
   ParallelLogger::stopCluster(cluster)
-  ParallelLogger::unregisterLogger(logger)
 
-  ## return(service_sector_data)
+  return(service_sector_data)
 
 }
 
@@ -245,13 +221,22 @@ generate_dummy_service_sector_data<-function(
     dplyr::mutate(
       events = purrr::pmap(.l=list(SOURCE, first_visit_year , last_visit_year , n_visits), .f=~{
         visit_type_probabilities |>
-          dplyr::filter(SOURCE==..1 & visit_year_bin_low >=..2 & visit_year_bin_high <=..3) |>
+          dplyr::filter(
+            SOURCE==..1 & (
+              # bin includes first_visit_year
+              (..2 > visit_year_bin_low & ..2 <= visit_year_bin_high)|
+                # bin includes last_visit_year
+                (..3 > visit_year_bin_low & ..3 <= visit_year_bin_high)|
+                # bin is between first_visit_year and last_visit_year
+                (..2 < visit_year_bin_low & ..3 >= visit_year_bin_high)
+            )
+          ) |>
           .sample_probability_tibble("per_visits", ..4) |>
-          select(CODE5, CODE6, CODE7, n_events, visit_year_bin_low, visit_year_bin_high)
+          select(CODE5, CODE6, CODE7, CODE8, CODE9, n_events, visit_year_bin_low, visit_year_bin_high)
       })) |>
     #
     tidyr::unnest(events) |>
-    dplyr::select(-n_visits, -first_visit_year, -last_visit_year, -birth_date, -first_visit_age ) |>
+    dplyr::select(-n_visits, -birth_date, -first_visit_age ) |>
     # add INDEX
     dplyr::group_by(SOURCE) |>
     dplyr::mutate(INDEX = row_number()) |>
@@ -275,19 +260,25 @@ generate_dummy_service_sector_data<-function(
   sampled_events <- sampled_visits |>
     dplyr::group_by(FINNGENID, SOURCE, visit_year_bin_low, visit_year_bin_high) |>
     dplyr::mutate(n_total_events = sum(n_events)) |>
-    dplyr::group_by(FINNGENID, SOURCE, visit_year_bin_low, visit_year_bin_high, n_total_events) |>
+    dplyr::group_by(FINNGENID, SOURCE, visit_year_bin_low, visit_year_bin_high, first_visit_year, last_visit_year, n_total_events) |>
     tidyr::nest() |>
     # For each visit calculate vocabulary for n_events based on SOURCE, and visit window
     dplyr::mutate(
-      events = purrr::pmap(.l=list(SOURCE, visit_year_bin_low  , visit_year_bin_high , n_total_events ), .f=~{
-        vocabulary_type_probabilities |>
-          dplyr::filter(SOURCE==..1 & event_year  >=..2 & event_year  <=..3) |>
-          .sample_probability_tibble("per_events", ..4) |>
-          select(vocabulary, event_year)
-      })) |>
+      events = purrr::pmap(.l=list(SOURCE,
+                                   pmax(visit_year_bin_low, first_visit_year)  ,
+                                   pmin(visit_year_bin_high, last_visit_year) ,
+                                   n_total_events ),
+                           .f=~{
+                             vocabulary_type_probabilities |>
+                               dplyr::filter(SOURCE==..1 & event_year  >=..2 & event_year  <=..3) |>
+                               .sample_probability_tibble("per_events", ..4) |>
+                               select(vocabulary, event_year)
+                           })) |>
     dplyr::ungroup() |>
+    # check all events have a value
+    dplyr::mutate(nn = purrr::map_int(events, nrow)) |> dplyr::filter(nn!=0) |> dplyr::select(-nn) |>
     # join events and visit info
-    dplyr::mutate(data = map2(.x=data, .y=events, ~{
+    dplyr::mutate(data = purrr::map2(.x=data, .y=events, ~{
       n = nrow(.x)
       dplyr::bind_cols(
         .x |> dplyr::sample_n(n)|> tidyr::uncount(n_events),
@@ -295,7 +286,7 @@ generate_dummy_service_sector_data<-function(
       )
     })) |>
     tidyr::unnest(data) |>
-    dplyr::select(-visit_year_bin_low, -visit_year_bin_high, -n_total_events, -events) |>
+    dplyr::select(-visit_year_bin_low, -visit_year_bin_high, -first_visit_year, -last_visit_year, -n_total_events, -events) |>
     # adjust the event_year to be the same for all the events in the same visit
     dplyr::group_by(SOURCE, INDEX) |>
     dplyr::mutate(event_year = mean(event_year) |>  round()) |>
@@ -436,30 +427,34 @@ generate_dummy_service_sector_data<-function(
   ###
   ParallelLogger::logInfo("Calculate death events")
 
-  if(nrow(sampled_patients |> dplyr::filter(is_death))){
+  death_sample_patients <- sampled_patients |> dplyr::filter(is_death)
+
+  if(nrow(death_sample_patients)>1){
     death_patients <- sampled_codes |>
-      dplyr::semi_join(sampled_patients |> dplyr::filter(is_death), by="FINNGENID") |>
+      dplyr::semi_join(death_sample_patients, by="FINNGENID") |>
       dplyr::arrange(desc(APPROX_EVENT_DAY)) |>
       dplyr::distinct(FINNGENID, .keep_all = T) |>
       dplyr::transmute(
         FINNGENID = FINNGENID,
         SOURCE = "DEATH",
-        APPROX_EVENT_DAY = APPROX_EVENT_DAY+lubridate::days(sample(0:30,dplyr::n())),
+        APPROX_EVENT_DAY = APPROX_EVENT_DAY+lubridate::days(sample(0:30,dplyr::n(), replace = TRUE)),
         CODE4 = as.integer(NA),
         CODE5 = as.character(NA),
         CODE6 = as.character(NA),
         CODE7 = as.double(NA),
+        CODE8 = as.character(NA),
+        CODE9 = as.character(NA),
         event_year = lubridate::year(APPROX_EVENT_DAY),
         ICDVER = case_when(
           event_year < 1988 ~ "8",
           event_year < 1996 ~ "9",
           TRUE ~ "10"
         ),
-        vocabulary = "death", # TO FIX ICDVER
+        vocabulary = ICDVER,
         INDEX = row_number()
       ) |>
       # add levels
-      dplyr::mutate(level = sample(0:5, dplyr::n())) |>
+      dplyr::mutate(level = sample(0:5, dplyr::n(), replace = TRUE)) |>
       tidyr::uncount(level) |>
       dplyr::group_by(INDEX) |>
       dplyr::mutate(
@@ -487,7 +482,7 @@ generate_dummy_service_sector_data<-function(
       dplyr::mutate(data = purrr::map2(data, codes, dplyr::bind_cols))  |>
       tidyr::unnest(data) |>
       dplyr::ungroup()|>
-      dplyr::select(-n_events, -codes, -vocabulary, -event_year)
+      dplyr::select(-n_events, -codes, -vocabulary)
 
   }else{
     death_patients <- sampled_codes |> dplyr::filter(FALSE)
@@ -514,7 +509,7 @@ generate_dummy_service_sector_data<-function(
     dplyr::mutate(EVENT_AGE = as.numeric(lubridate::interval(birth_date, APPROX_EVENT_DAY),"years"))|>
     dplyr::mutate(EVENT_AGE = round(EVENT_AGE, digits = 2))|>
     #
-    dplyr::transmute(FINNGENID, SOURCE, EVENT_AGE, APPROX_EVENT_DAY, CODE1, CODE2, CODE3, CODE4, CODE5, CODE6, CODE7, ICDVER, CATEGORY, INDEX)
+    dplyr::select(FINNGENID, SOURCE, EVENT_AGE, APPROX_EVENT_DAY, CODE1, CODE2, CODE3, CODE4, CODE5, CODE6, CODE7, CODE8, CODE9, ICDVER, CATEGORY, INDEX)
 
   #
   ParallelLogger::logInfo("Reformated longitudinal data: ", scales::number(length(sampled_events))," events")

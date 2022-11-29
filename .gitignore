@@ -5,3 +5,4 @@
 .DS_Store
 
 *.tsv
+inst/doc

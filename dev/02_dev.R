@@ -22,4 +22,14 @@ usethis::use_package( "slider")
 usethis::use_data_raw(name="summary_data")
 
 # fuctions
-usethis::use_r("generate_dummy_longitudinal_data")
+usethis::use_r("generate_dummy_service_sector_data")
+usethis::use_r("generate_dummy_covariates_minimal_baseline_data")
+usethis::use_r("scanReportToTibble")
+
+usethis::use_r("generate_all_datasets_to_files")
+
+
+
+
+# vignete
+usethis::use_vignette("create_dummy_data")

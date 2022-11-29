@@ -158,10 +158,10 @@ rm(observation_periods_summary)
 ## 2. Calculate visits_summary ------------------------------------
 log4r::info(logger, "Calculate visits_summary")
 
-visit_year_cuts <-  c(0, 1986, 1995, 2002, 2010, 2018, 2100)
+visit_year_cuts <-  c(1, 1986, 1994, 2001, 2009, 2017, 2100)
 
 tictoc::tic()
-count_visits_per_patient <- service_sector_data |>
+count_visits_per_patient <- service_sector_data |> #dplyr::sample_n(1000) |>
   # ignore CODE5 and CODE6 for PURCH : reimbursement in euros
   # ignore CODE7 for all except PRIM_OUT: hospital-type
   dplyr::mutate(
