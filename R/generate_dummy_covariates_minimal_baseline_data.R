@@ -1,5 +1,15 @@
 
 
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param person_level_data_version PARAM_DESCRIPTION, Default: 'R10v1'
+#' @param n_patients_minimum PARAM_DESCRIPTION, Default: 100
+#' @param seed PARAM_DESCRIPTION, Default: 13
+#' @param service_sector_data PARAM_DESCRIPTION, Default: NULL
+#' @return list of created tables
+#' @export
+#' @importFrom dplyr mutate arrange desc distinct transmute left_join if_else select rename
+#' @importFrom lubridate as_date dyears year
 generate_dummy_covariates_minimal_baseline_data <- function(
   person_level_data_version="R10v1",
   n_patients_minimum = 100,
