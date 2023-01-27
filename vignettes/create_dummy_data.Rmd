@@ -108,9 +108,92 @@ service_sector_data_vocab <- service_sector_data |>
 
 ```{r}
 service_sector_data_vocab |> 
-  count(SOURCE, vocabulary, event_year) |> 
+  count(SOURCE, vocabulary, event_year, name = "n_events") |> 
   #
-  ggplot(aes(x=event_year, y=n, fill=vocabulary))+
+  ggplot(aes(x=event_year, y=n_events, fill=vocabulary))+
   geom_bar(stat = "identity")+
-  facet_grid(SOURCE~., scales = "free_y")
+  facet_grid(SOURCE~., scales = "free_y")+
+    theme(legend.position="bottom")
 ```
+
+
+## Visit type code calss over time 
+
+```{r}
+service_sector_visits <- service_sector_data |> distinct(SOURCE, INDEX, .keep_all = TRUE)
+```
+
+
+```{r}
+service_sector_visits |> 
+ mutate(
+    VisitType_class = dplyr::case_when(
+      SOURCE %in% c("INPAT", "OUTPAT", "OPER_IN", "OPER_OUT") & !is.na(CODE5) & is.na(CODE8) & is.na(CODE9) ~ "SOURCE | ServiceSector", 
+      SOURCE %in% c("INPAT", "OUTPAT", "OPER_IN", "OPER_OUT") & !is.na(CODE5) & (!is.na(CODE8) | !is.na(CODE9)) ~ "SOURCE | ServiceSector AND SOURCE | Contact Type | Urgency", 
+      SOURCE %in% c("INPAT", "OUTPAT", "OPER_IN", "OPER_OUT") & is.na(CODE5) & (!is.na(CODE8) | !is.na(CODE9)) ~ "SOURCE | Contact Type | Urgency", 
+      SOURCE %in% c("PRIM_OUT") & (!is.na(CODE5) | !is.na(CODE6)) ~ "SOURCE | Contact Type | Service Type", 
+      TRUE ~ "SOURCE"
+    ), 
+    event_year = lubridate::year(APPROX_EVENT_DAY)
+  ) |> 
+  count(SOURCE, VisitType_class, event_year, name = "n_visists") |> 
+  #
+  ggplot(aes(x=event_year, y=n_visists, fill=VisitType_class))+
+  geom_bar(stat = "identity")+
+  facet_grid(SOURCE~., scales = "free_y")+
+    theme(legend.position="bottom", legend.direction="vertical")
+```
+
+## Provider code vocabulary over time 
+
+```{r}
+
+service_sector_visits |> 
+ mutate(
+    Provider_vocabulary = dplyr::case_when(
+      SOURCE %in% c("INPAT", "OUTPAT", "OPER_IN", "OPER_OUT") & !is.na(CODE6) ~ "MEDSPECfi", 
+      SOURCE %in% c("PRIM_OUT") & !is.na(CODE7) ~ "ProfessionalCode", 
+      TRUE ~ "NA"
+    ), 
+    event_year = lubridate::year(APPROX_EVENT_DAY)
+  ) |> 
+  count(SOURCE, Provider_vocabulary, event_year, name = "n_visists") |> 
+  #
+  ggplot(aes(x=event_year, y=n_visists, fill=Provider_vocabulary))+
+  geom_bar(stat = "identity")+
+  facet_grid(SOURCE~., scales = "free_y")+
+    theme(legend.position="bottom")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

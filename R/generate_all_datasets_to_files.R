@@ -67,7 +67,11 @@ generate_all_dummy_data_to_files<-function(
   baseline_data <-  res$baseline_data
 
   # re adjust number of subjects
-  covariates_data <- covariates_data |> dplyr::sample_n(n_patients_covaraites)
+  covariates_data <- covariates_data |>
+    dplyr::mutate(IID = FID) |>
+    dplyr::select(-is_death, -bday, -age_last)|>
+    dplyr::sample_n(n_patients_covaraites) |>
+    dplyr::select(FID, IID, 2:162)
   baseline_data <- baseline_data |> dplyr::sample_n(n_patients_baseline)
 
 
