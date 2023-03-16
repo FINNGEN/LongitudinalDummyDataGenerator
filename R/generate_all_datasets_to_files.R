@@ -6,19 +6,12 @@ generate_all_dummy_data_to_files<-function(
     service_sector_data_version="R10v2",
     person_level_data_version="R10v1",
     n_patients_minimum = 100,
-    per_patients_baseline = 0.99,
-    per_patients_covariates = 0.95,
     per_patients_service_sector = 0.99,
     seed = 13,
     nTreaths=(parallel::detectCores() -2)
 ){
 
 
-
-
-
-  n_patients_baseline <- round(n_patients_minimum*per_patients_baseline)
-  n_patients_covaraites <- round(n_patients_minimum*per_patients_covariates)
   n_patients_service_sector <- round(n_patients_minimum*per_patients_service_sector)
 
 
@@ -55,25 +48,12 @@ generate_all_dummy_data_to_files<-function(
   #
   ParallelLogger::logInfo("Generate person level data")
 
-  res <- generate_dummy_covariates_minimal_baseline_data(
+  minimum_extended <- generate_dummy_minimum_extended_data(
     person_level_data_version = person_level_data_version,
     n_patients_minimum = n_patients_minimum,
     seed = seed,
     service_sector_data = service_sector_data
   )
-
-  minimum_data <-  res$minimum_data
-  covariates_data <-  res$covariates_data
-  baseline_data <-  res$baseline_data
-
-  # re adjust number of subjects
-  covariates_data <- covariates_data |>
-    dplyr::mutate(IID = FID) |>
-    dplyr::select(-is_death, -bday, -age_last)|>
-    dplyr::sample_n(n_patients_covaraites) |>
-    dplyr::select(FID, IID, 2:162)
-  baseline_data <- baseline_data |> dplyr::sample_n(n_patients_baseline)
-
 
 
 
@@ -83,15 +63,8 @@ generate_all_dummy_data_to_files<-function(
   file_name <- stringr::str_c("dummy_service_sector_", service_sector_data_version, ".txt" )
   service_sector_data |> readr::write_tsv(file.path(output_folder, file_name))
 
-  file_name <- stringr::str_c("dummy_minimum_", person_level_data_version, ".txt" )
-  minimum_data |> readr::write_tsv(file.path(output_folder, file_name))
-
-  file_name <- stringr::str_c("dummy_covariates_", person_level_data_version, ".txt" )
-  covariates_data |> readr::write_tsv(file.path(output_folder, file_name))
-
-  file_name <- stringr::str_c("dummy_baseline_", person_level_data_version, ".txt" )
-  baseline_data |> readr::write_tsv(file.path(output_folder, file_name))
-
+  file_name <- stringr::str_c("dummy_minimum_extended", person_level_data_version, ".txt" )
+  minimum_extended |> readr::write_tsv(file.path(output_folder, file_name))
 
   ParallelLogger::logInfo("Saved data")
   ParallelLogger::unregisterLogger(logger)
