@@ -8,17 +8,26 @@ Scripts to summaryse features from FinnGen's register data and to produce static
 install.packages("remotes")
 remotes::install_github("FINNGEN/LongitudinalDummyDataGenerator")
 ```
+
 ## Run
-``` r
-LongitudinalDummyDataGenerator::generate_dummy_service_sector_data(
-    output_folder = tempdir(), # directory where to ouput the data 
-    longitudinal_data_version = "DF10v2", #at the moment only DF10v2 is avalilable
-    n_patients = 100, # number of random patients to genenrate 
-    seed = 13, # seed used in the random processes 
-    nTreaths = 3 # number of cores to use when using paraller generation 
-)
+```{r}
+service_sector_data_version = "R11v2"
+person_level_data_version="R11v1"
+n_patients_minimum <- 3000
 ```
 
+```{r, eval=FALSE}
+tictoc::tic()
+LongitudinalDummyDataGenerator::generate_all_dummy_data_to_files(
+  output_folder = output_folder,
+  service_sector_data_version = service_sector_data_version,
+  person_level_data_version = person_level_data_version,
+  n_patients_minimum = n_patients_minimum,
+  seed = 13,
+  nTreaths=(parallel::detectCores() -2)
+)
+tictoc::toc()
+```
 
 ## How it works
 1. Generate N patients with first observation year, last observation year, and number of visits of each SOURCE within the observation period. Proportion of these values are similar to real data.
