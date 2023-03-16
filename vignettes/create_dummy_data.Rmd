@@ -17,7 +17,7 @@ devtools::load_all(".")
 ```
 
 ```{r}
-output_folder <- r"(C:\Users\javier\WorkSpace\FINNGEN\atlas-dev-data\dummy_data_v2\r10_v2_5k\output_dummy_generator)"
+output_folder <- r"(C:\Users\javier\WorkSpace\FINNGEN\atlas-dev-data\dummy_data_v3\r10_v2_5k\output_dummy_generator)"
 ```
 
 # Generate service sector dummy data
@@ -36,9 +36,6 @@ generate_all_dummy_data_to_files(
   service_sector_data_version = service_sector_data_version,
   person_level_data_version = person_level_data_version,
   n_patients_minimum = n_patients_minimum,
-  per_patients_baseline = 0.99,
-  per_patients_covariates = 0.95,
-  per_patients_service_sector = 0.99,
   seed = 13,
   nTreaths=(parallel::detectCores() -2)
 )
@@ -55,14 +52,8 @@ service_sector_data <- readr::read_tsv(
   file.path(output_folder, file_name), 
   col_types = readr::cols(.default = readr::col_character()))
 
-file_name <- stringr::str_c("dummy_minimum_", person_level_data_version, ".txt" )
-minimum_data <- readr::read_tsv(file.path(output_folder, file_name))
-
-file_name <- stringr::str_c("dummy_covariates_", person_level_data_version, ".txt" )
-covariates_data <- readr::read_tsv(file.path(output_folder, file_name))
-
-file_name <- stringr::str_c("dummy_baseline_", person_level_data_version, ".txt" )
-baseline_data <- readr::read_tsv(file.path(output_folder, file_name))
+file_name <- stringr::str_c("dummy_minimum_extended", person_level_data_version, ".txt" )
+minimum_extended <- readr::read_tsv(file.path(output_folder, file_name))
 ```
 
 # Assess data
@@ -74,9 +65,7 @@ library(tidyverse)
 
 bind_rows(
   service_sector_data |> distinct(FINNGENID) |> mutate(table="service_sector"),
-  minimum_data |> distinct(FINNGENID) |> mutate(table="minimum"),
-  covariates_data |> mutate(FINNGENID=FID) |>  distinct(FINNGENID) |> mutate(table="covariates"),
-  baseline_data |> distinct(FINNGENID) |> mutate(table="baseline")
+  minimum_extended |> distinct(FINNGENID) |> mutate(table="minimum_extended")
 ) |> 
   group_by(FINNGENID) |> 
   summarise(Pathways = list(table)) |> 

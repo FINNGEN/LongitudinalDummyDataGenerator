@@ -458,14 +458,14 @@ generate_dummy_service_sector_data<-function(
       tidyr::uncount(level) |>
       dplyr::group_by(INDEX) |>
       dplyr::mutate(
-        CATAEGORY = dplyr::row_number(),
-        CATAEGORY=dplyr::case_when(
-          CATAEGORY==1~"c1",
-          CATAEGORY==2~"c2",
-          CATAEGORY==3~"c3",
-          CATAEGORY==4~"c4",
-          CATAEGORY==5~"I",
-          CATAEGORY==0~"U",
+        CATEGORY = dplyr::row_number(),
+        CATEGORY=dplyr::case_when(
+          CATEGORY==1~"c1",
+          CATEGORY==2~"c2",
+          CATEGORY==3~"c3",
+          CATEGORY==4~"c4",
+          CATEGORY==5~"I",
+          CATEGORY==0~"U",
           TRUE ~ as.character(NA)
         )) |>
       # find code
