@@ -136,6 +136,25 @@ for(folder in summary_data_folders){
 
   }
 
+  #
+  # BIRTH MOTHER DATA
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "birth"))){
+    ## birth_mother scan report
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_birth_mother <- read_csv(
+      file.path(summary_data_path, folder, "birth", "ScanReport_birth_mother.csv"),
+      col_types = col_types)
+
+    ScanReport_birth_mother <- ScanReport_birth_mother |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]]<- list(birth_mother=list(ScanReport_birth_mother = ScanReport_birth_mother ))
+
+  }
 
 
 
