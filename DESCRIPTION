@@ -1,6 +1,6 @@
 Package: LongitudinalDummyDataGenerator
 Title: Longitudinal Dummy Data Generator
-Version: 3.0.0
+Version: 3.1.0
 Authors@R: 
     person(given = "Javier",
            family = "Gracia-Tabuenca",
