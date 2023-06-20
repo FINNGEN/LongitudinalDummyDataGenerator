@@ -1,5 +1,5 @@
 ---
-title: "create_dummy_data"
+title: "Dummy data overview"
 output:
   html_document: default
 ---
@@ -17,14 +17,14 @@ devtools::load_all(".")
 ```
 
 ```{r}
-output_folder <- r"(C:\Users\javier\WorkSpace\FINNGEN\atlas-dev-data\dummy_data_v3\r10_v2_5k\output_dummy_generator)"
+output_folder <- "../output_dummy_generator/"
 ```
 
 # Generate service sector dummy data
 
 ```{r}
-service_sector_data_version = "R10v2"
-person_level_data_version="R10v1"
+service_sector_data_version = "R11v1"
+person_level_data_version="R11v1"
 n_patients_minimum <- 5000
 ```
 
@@ -52,7 +52,7 @@ service_sector_data <- readr::read_tsv(
   file.path(output_folder, file_name), 
   col_types = readr::cols(.default = readr::col_character()))
 
-file_name <- stringr::str_c("dummy_minimum_extended", person_level_data_version, ".txt" )
+file_name <- stringr::str_c("dummy_minimum_extended_", person_level_data_version, ".txt" )
 minimum_extended <- readr::read_tsv(file.path(output_folder, file_name))
 ```
 
