@@ -6,3 +6,6 @@
 
 *.tsv
 inst/doc
+
+
+output_dummy_generator/*
