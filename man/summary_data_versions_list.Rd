@@ -5,7 +5,7 @@
 \alias{summary_data_versions_list}
 \title{Collection of summary tables for building the dummy datasets.}
 \format{
-An object of class \code{list} of length 1.
+An object of class \code{list} of length 2.
 }
 \usage{
 summary_data_versions_list
