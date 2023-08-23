@@ -7,8 +7,6 @@
 #' @param output_folder Path to the folder where the generated data will be saved.
 #' @param service_sector_data_version Version of the service sector data (default: "R10v2").
 #' @param person_level_data_version Version of the person level data (default: "R10v1").
-#' @param birth_mother_level_data_version Version of the person level data (default: "R10v3").
-#' @param vision_level_data_version Version of the person level data (default: "R10v4").
 #' @param n_patients_minimum Number of patients to generate (default: 100).
 #' @param per_patients_service_sector Proportion of patients relative to n_patients_minimum to generate service sector data from  (default: 0.99).
 #' @param seed Seed value for random number generation (default: 13).
@@ -21,8 +19,6 @@ generate_all_dummy_data_to_files<-function(
     output_folder,
     service_sector_data_version="R10v2",
     person_level_data_version="R10v1",
-    birth_mother_level_data_version="R10v3",
-    vision_level_data_version="R10v4",
     n_patients_minimum = 100,
     per_patients_service_sector = 0.99,
     seed = 13,
@@ -73,29 +69,6 @@ generate_all_dummy_data_to_files<-function(
     service_sector_data = service_sector_data
   )
 
-  #
-  # generate birth_mother data
-  #
-  ParallelLogger::logInfo("Generate birth_mother data")
-
-  birth_mother <- generate_dummy_mothers_birth_register_data(
-    birth_mother_level_data_version = birth_mother_level_data_version,
-    n_patients_minimum = n_patients_minimum,
-    seed = seed,
-    service_sector_data = service_sector_data
-  )
-
-  #
-  # generate vision data
-  #
-  ParallelLogger::logInfo("Generate vision data")
-
-  vision <- generate_dummy_vision_register_data(
-    vision_level_data_version = vision_level_data_version,
-    n_patients_minimum = n_patients_minimum,
-    seed = seed,
-    minimum_extended = minimum_extended
-  )
 
 
   ## SAVE
@@ -104,14 +77,8 @@ generate_all_dummy_data_to_files<-function(
   file_name <- stringr::str_c("dummy_service_sector_", service_sector_data_version, ".txt" )
   service_sector_data |> readr::write_tsv(file.path(output_folder, file_name))
 
-  file_name <- stringr::str_c("dummy_minimum_extended_", person_level_data_version, ".txt" )
+  file_name <- stringr::str_c("dummy_minimum_extended", person_level_data_version, ".txt" )
   minimum_extended |> readr::write_tsv(file.path(output_folder, file_name))
-
-  file_name <- stringr::str_c("dummy_birth_mother_", birth_mother_level_data_version, ".txt" )
-  birth_mother |> readr::write_tsv(file.path(output_folder, file_name))
-
-  file_name <- stringr::str_c("dummy_vision_", vision_level_data_version, ".txt" )
-  vision |> readr::write_tsv(file.path(output_folder, file_name))
 
   ParallelLogger::logInfo("Saved data")
   ParallelLogger::unregisterLogger(logger)
