@@ -156,6 +156,25 @@ for(folder in summary_data_folders){
 
   }
 
+  #
+  # VISION DATA
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "vision"))){
+    ## vision scan report
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_vision <- read_csv(
+      file.path(summary_data_path, folder, "vision", "ScanReport_vision.csv"),
+      col_types = col_types)
+
+    ScanReport_vision <- ScanReport_vision |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]]<- list(vision=list(ScanReport_vision = ScanReport_vision ))
+
+  }
 
 
 }
