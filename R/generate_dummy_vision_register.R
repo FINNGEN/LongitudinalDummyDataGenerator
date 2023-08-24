@@ -37,9 +37,9 @@ generate_dummy_vision_register_data <- function(
 
     # Get FU_END_AGE from minimum_extended data
     vision_data <- vision_data |>
-      dplyr::left_join(minimum_extended %>% dplyr::select(FINNGENID, FU_END_AGE), by = "FINNGENID") |>
-      rowwise() |>
-      dplyr::mutate(EVENT_AGE = runif(1, min = 0.01, max = as.double(FU_END_AGE))) |>
+      dplyr::left_join(minimum_extended |> dplyr::select(FINNGENID, FU_END_AGE), by = "FINNGENID") |>
+      dplyr::rowwise() |>
+      dplyr::mutate(EVENT_AGE = sprintf("%.2f", runif(1, min = 0.01, max = as.double(FU_END_AGE)))) |>
       dplyr::select(-FU_END_AGE)
 
   }
