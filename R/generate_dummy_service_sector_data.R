@@ -474,6 +474,11 @@ generate_dummy_service_sector_data<-function(
       #
       dplyr::mutate( codes = purrr::pmap(.l=list(SOURCE, vocabulary, n_events), .f=~{
         codes_probabilities |>
+          # tmp fix: SOURCE=="DEATH" vocabulary="8" is empty
+          dplyr::bind_rows(
+            tibble::tibble(SOURCE = "DEATH", CODE1=as.character(NA), CODE2=as.character(NA), CODE3=as.character(NA), vocabulary="8", per_events=1)
+          ) |>
+          # end tmp fix
           dplyr::filter(SOURCE==..1 & vocabulary==..2) |>
           .sample_probability_tibble("per_events", ..3) |>
           dplyr::select(CODE1, CODE2, CODE3 )
