@@ -110,8 +110,8 @@ generate_dummy_minimum_extended_data <- function(
       APPROX_BIRTH_DATE,
       BL_YEAR, BL_AGE,  SEX,
       HEIGHT,  HEIGHT_AGE,
-      BMI,
       WEIGHT,  WEIGHT_AGE,
+      BMI,
       #SMOKE2,  SMOKE3,  SMOKE5,  SMOKE_AGE,
       SMOKE2,  SMOKE3,  SMOKE5,  CURRENT_SMOKER, EVER_SMOKER, SMOKE_AGE,
       regionofbirth,     regionofbirthname,
@@ -121,7 +121,7 @@ generate_dummy_minimum_extended_data <- function(
       COHORT,
       #FU_END_AGE = AGE_AT_DEATH_OR_END_OF_FOLLOWUP,
       #DEATH, DEATH_AGE, DEATH_YEAR,
-      DEATH, DEATH_FU_AGE, AGE_AT_DEATH_OR_END_OF_FOLLOWUP
+      DEATH, DEATH_APPROX_EVENT_DAY, DEATH_FU_AGE, AGE_AT_DEATH_OR_END_OF_FOLLOWUP
       #APPROX_BIRTH_DAY = bday
       )
 
