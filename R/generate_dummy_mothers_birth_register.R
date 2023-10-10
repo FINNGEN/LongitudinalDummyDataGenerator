@@ -53,8 +53,8 @@ generate_dummy_mothers_birth_register_data <- function(
     birth_mother_data <- birth_mother_data |>
       dplyr::left_join(ss_summary, by="FINNGENID") |>
       dplyr::mutate(
-        APPROX_BIRTH_DATE = dplyr::if_else(is.na(bday), lubridate::make_date(as.numeric(BIRTH_YEAR),1,1) + lubridate::days(round(abs(as.numeric(MOTHER_AGE) - floor(as.numeric(MOTHER_AGE))) * 365.24)), lubridate::as_date(bday + lubridate::dyears(as.numeric(MOTHER_AGE)))),
-        BIRTH_YEAR = lubridate::year(APPROX_BIRTH_DATE)
+        APPROX_DELIVERY_DATE = dplyr::if_else(is.na(bday), lubridate::make_date(as.numeric(DELIVERY_YEAR),1,1) + lubridate::days(round(abs(as.numeric(MOTHER_AGE) - floor(as.numeric(MOTHER_AGE))) * 365.24)), lubridate::as_date(bday + lubridate::dyears(as.numeric(MOTHER_AGE)))),
+        DELIVERY_YEAR = lubridate::year(APPROX_DELIVERY_DATE)
       ) |>
       dplyr::select(-bday)
   }
