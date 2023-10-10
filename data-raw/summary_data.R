@@ -176,6 +176,26 @@ for(folder in summary_data_folders){
 
   }
 
+  #
+  # MINIMUM DATA
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "minimum"))){
+    ## minimum scanreport
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_minimum <- read_csv(
+      file.path(summary_data_path, folder, "minimum", "ScanReport_minimum.csv"),
+      col_types = col_types)
+
+    ScanReport_minimum <- ScanReport_minimum |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]]<- list(minimum=list(ScanReport_minimum = ScanReport_minimum ))
+
+  }
+
 
 }
 
