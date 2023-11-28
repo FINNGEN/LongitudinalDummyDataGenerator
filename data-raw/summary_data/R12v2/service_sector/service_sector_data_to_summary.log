@@ -1,0 +1,15 @@
+INFO  [2023-11-27 08:49:37] Calculate observation_periods_summary
+INFO  [2023-11-27 08:55:02] observation_periods_summary: n unique codes 1132 : n unique codes more than 5 patients 741 : percent unique codes lost 34.54%
+INFO  [2023-11-27 08:55:02] save observation_periods_summary table 
+INFO  [2023-11-27 11:36:53] Calculate visits_summary
+INFO  [2023-11-27 11:42:17] count_visits_per_patient: n unique codes 13020 : n unique codes more than 5 patients 7359 : percent unique codes lost 56.52%
+INFO  [2023-11-27 11:46:19] save count_visits_per_patient table 
+INFO  [2023-11-27 11:46:19] Calculate SOURCE_VOCAB_EVENT_YEAR_summary
+INFO  [2023-11-27 11:46:39] SOURCE_VOCAB_EVENT_YEAR_summary: n unique codes 558 : n unique codes more than 5 patients 510 : percent unique codes lost 8.60%
+INFO  [2023-11-27 11:46:39] save SOURCE_VOCAB_EVENT_YEAR_summary table 
+INFO  [2023-11-27 11:46:39] Calculate CODE1_CODE2_CODE3_vocabulary_summary
+INFO  [2023-11-27 11:46:49] observation_periods_summary_summary: n unique codes 101424 : n unique codes more than 5 patients 52691 : percent unique codes lost 48.05%
+INFO  [2023-11-27 11:46:49] save CODE1_CODE2_CODE3_vocabulary_summary table 
+INFO  [2023-11-27 11:46:49] Calculate CODE4_summary
+INFO  [2023-11-27 11:47:07] CODE4_summary: n unique codes 38 : n unique codes more than 5 patients 38 : percent unique codes lost 0.00%
+INFO  [2023-11-27 11:47:07] save CODE4_summary table 
