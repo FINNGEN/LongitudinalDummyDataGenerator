@@ -1,7 +1,7 @@
 
 #' @title generate_dummy_vision_data
 #' @description FUNCTION_DESCRIPTION
-#' @param vision_level_data_version PARAM_DESCRIPTION, Default: 'R10v3'
+#' @param vision_level_data_version PARAM_DESCRIPTION, Default: 'R12v4'
 #' @param n_patients_minimum PARAM_DESCRIPTION, Default: 100
 #' @param description PARAM_DESCRIPTION, Default: Vision dummy data generator
 #' @param seed PARAM_DESCRIPTION, Default: 13
