@@ -2,7 +2,7 @@
 
 #' @title generate_dummy_birth_mother_data
 #' @description FUNCTION_DESCRIPTION
-#' @param birth_mother_level_data_version PARAM_DESCRIPTION, Default: 'R10v3'
+#' @param birth_mother_level_data_version PARAM_DESCRIPTION, Default: 'R12v3'
 #' @param n_patients_minimum PARAM_DESCRIPTION, Default: 100
 #' @param description PARAM_DESCRIPTION, Default: Birth Mother dummy data generator
 #' @param seed PARAM_DESCRIPTION, Default: 13
@@ -12,7 +12,7 @@
 #' @importFrom dplyr mutate arrange desc distinct transmute left_join if_else select rename
 #' @importFrom lubridate as_date dyears make_date days year
 generate_dummy_mothers_birth_register_data <- function(
-    birth_mother_level_data_version="R10v3",
+    birth_mother_level_data_version="R12v3",
     n_patients_minimum = 100,
     seed=13,
     service_sector_data = NULL
