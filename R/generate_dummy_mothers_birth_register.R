@@ -2,7 +2,7 @@
 
 #' @title generate_dummy_birth_mother_data
 #' @description FUNCTION_DESCRIPTION
-#' @param birth_mother_level_data_version PARAM_DESCRIPTION, Default: 'R10v3'
+#' @param birth_mother_level_data_version PARAM_DESCRIPTION, Default: 'R12v3'
 #' @param n_patients_minimum PARAM_DESCRIPTION, Default: 100
 #' @param description PARAM_DESCRIPTION, Default: Birth Mother dummy data generator
 #' @param seed PARAM_DESCRIPTION, Default: 13
@@ -12,7 +12,7 @@
 #' @importFrom dplyr mutate arrange desc distinct transmute left_join if_else select rename
 #' @importFrom lubridate as_date dyears make_date days year
 generate_dummy_mothers_birth_register_data <- function(
-    birth_mother_level_data_version="R10v3",
+    birth_mother_level_data_version="R12v3",
     n_patients_minimum = 100,
     seed=13,
     service_sector_data = NULL
@@ -53,8 +53,8 @@ generate_dummy_mothers_birth_register_data <- function(
     birth_mother_data <- birth_mother_data |>
       dplyr::left_join(ss_summary, by="FINNGENID") |>
       dplyr::mutate(
-        APPROX_BIRTH_DATE = dplyr::if_else(is.na(bday), lubridate::make_date(as.numeric(BIRTH_YEAR),1,1) + lubridate::days(round(abs(as.numeric(MOTHER_AGE) - floor(as.numeric(MOTHER_AGE))) * 365.24)), lubridate::as_date(bday + lubridate::dyears(as.numeric(MOTHER_AGE)))),
-        BIRTH_YEAR = lubridate::year(APPROX_BIRTH_DATE)
+        APPROX_DELIVERY_DATE = dplyr::if_else(is.na(bday), lubridate::make_date(as.numeric(DELIVERY_YEAR),1,1) + lubridate::days(round(abs(as.numeric(MOTHER_AGE) - floor(as.numeric(MOTHER_AGE))) * 365.24)), lubridate::as_date(bday + lubridate::dyears(as.numeric(MOTHER_AGE)))),
+        DELIVERY_YEAR = lubridate::year(APPROX_DELIVERY_DATE)
       ) |>
       dplyr::select(-bday)
   }
