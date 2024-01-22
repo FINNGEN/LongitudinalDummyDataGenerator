@@ -1,6 +1,6 @@
 #' @title generate_dummy_service_sector_data
 #' @description Generates a file with dummy data in the service sector format.
-#' @param service_sector_data_version at the moment only DF6v2 is available, Default: 'R10v2'
+#' @param service_sector_data_version at the moment only DF6v2 is available, Default: 'R12v2'
 #' @param n_patients number of random patients to generate, Default: 30
 #' @param n_cuts PARAM_DESCRIPTION, Default: 3
 #' @param seed seed used in the random processes, Default: 13
@@ -16,7 +16,7 @@
 #' @importFrom stringr str_c
 #' @importFrom scales number
 generate_dummy_service_sector_data<-function(
-    service_sector_data_version="R10v2",
+    service_sector_data_version="R12v2",
     n_patients=30,
     n_cuts=nTreaths,
     seed=13,
@@ -93,7 +93,7 @@ generate_dummy_service_sector_data<-function(
 #' @description Create a tibble with dummy data in the service sector format.
 #' This function is ran in parallel by function generate_dummy_service_sector_data.
 #' @param par_parameters PARAM_DESCRIPTION, Default: list(n_patients = 30, n_patients_offset = 0, seed = 13)
-#' @param service_sector_data_version PARAM_DESCRIPTION, Default: 'R10v2'
+#' @param service_sector_data_version PARAM_DESCRIPTION, Default: 'R12v2'
 #' @return OUTPUT_DESCRIPTION
 #'
 #' @importFrom ParallelLogger logInfo
@@ -110,7 +110,7 @@ generate_dummy_service_sector_data<-function(
       n_patients_offset = 0,
       seed = 13
     ),
-    service_sector_data_version = "R10v2"
+    service_sector_data_version = "R12v2"
 ){
 
   n_patients <- par_parameters$n_patients
@@ -511,7 +511,7 @@ generate_dummy_service_sector_data<-function(
     dplyr::left_join(sampled_patients|>
                        dplyr::select(FINNGENID, birth_date), by="FINNGENID")|>
     dplyr::mutate(EVENT_AGE = as.numeric(lubridate::interval(birth_date, APPROX_EVENT_DAY),"years"))|>
-    dplyr::mutate(EVENT_AGE = round(EVENT_AGE, digits = 2))|>
+    dplyr::mutate(EVENT_AGE = round(EVENT_AGE, digits = 3))|>
     #
     dplyr::select(FINNGENID, SOURCE, EVENT_AGE, APPROX_EVENT_DAY, CODE1, CODE2, CODE3, CODE4, CODE5, CODE6, CODE7, CODE8, CODE9, ICDVER, CATEGORY, INDEX)
 
