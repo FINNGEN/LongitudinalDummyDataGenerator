@@ -6,7 +6,7 @@
 #'
 #' @param output_folder Path to the folder where the generated data will be saved.
 #' @param service_sector_data_version Version of the service sector data (default: "R10v2").
-#' @param person_level_data_version Version of the person level data (default: "R10v1").
+#' @param person_level_data_version Version of the person level data (default: "R12v1").
 #' @param n_patients_minimum Number of patients to generate (default: 100).
 #' @param per_patients_service_sector Proportion of patients relative to n_patients_minimum to generate service sector data from  (default: 0.99).
 #' @param seed Seed value for random number generation (default: 13).
@@ -18,7 +18,7 @@
 generate_all_dummy_data_to_files<-function(
     output_folder,
     service_sector_data_version="R10v2",
-    person_level_data_version="R10v1",
+    person_level_data_version="R12v1",
     n_patients_minimum = 100,
     per_patients_service_sector = 0.99,
     seed = 13,
