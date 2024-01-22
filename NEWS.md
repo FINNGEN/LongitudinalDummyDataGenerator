@@ -1,3 +1,5 @@
+# LongitudinalDummyDataGenerator 3.2.0
+
 # LongitudinalDummyDataGenerator 3.1.0
 
 - Update renv to R4.3.0
