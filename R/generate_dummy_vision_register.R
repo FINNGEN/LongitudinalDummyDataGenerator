@@ -11,7 +11,7 @@
 #' @importFrom dplyr mutate arrange desc distinct transmute left_join if_else select rename
 #' @importFrom lubridate as_date dyears make_date days year
 generate_dummy_vision_register_data <- function(
-    vision_level_data_version="R12v4",
+    vision_level_data_version="R12v1",
     n_patients_minimum = 100,
     seed=13,
     minimum_extended = NULL

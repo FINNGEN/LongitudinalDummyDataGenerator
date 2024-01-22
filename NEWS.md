@@ -1,5 +1,9 @@
 # LongitudinalDummyDataGenerator 3.2.0
 
+- Upadate to df12
+- added birth register
+- added vision register
+
 # LongitudinalDummyDataGenerator 3.1.0
 
 - Update renv to R4.3.0

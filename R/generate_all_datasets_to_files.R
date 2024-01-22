@@ -17,8 +17,10 @@
 #' @export
 generate_all_dummy_data_to_files<-function(
     output_folder,
-    service_sector_data_version="R10v2",
+    service_sector_data_version="R112v1",
     person_level_data_version="R12v1",
+    birth_mother_level_data_version="R12v1",
+    vision_level_data_version="R12v1",
     n_patients_minimum = 100,
     per_patients_service_sector = 0.99,
     seed = 13,
@@ -69,6 +71,29 @@ generate_all_dummy_data_to_files<-function(
     service_sector_data = service_sector_data
   )
 
+  #
+  # generate birth mother level data
+  #
+  ParallelLogger::logInfo("Generate birth mother level data")
+
+  birth_mother_extended <- generate_dummy_mothers_birth_register_data(
+    birth_mother_level_data_version = birth_mother_level_data_version,
+    n_patients_minimum = n_patients_minimum,
+    seed = seed,
+    service_sector_data = service_sector_data
+  )
+
+
+  #
+  # generate vision level data
+  #
+  ParallelLogger::logInfo("Generate vision level data")
+
+  vision_extended <- generate_dummy_vision_register_data(
+    vision_level_data_version = vision_level_data_version,
+    n_patients_minimum = n_patients_minimum,
+    seed = seed
+  )
 
 
   ## SAVE
@@ -77,8 +102,14 @@ generate_all_dummy_data_to_files<-function(
   file_name <- stringr::str_c("dummy_service_sector_", service_sector_data_version, ".txt" )
   service_sector_data |> readr::write_tsv(file.path(output_folder, file_name))
 
-  file_name <- stringr::str_c("dummy_minimum_extended", person_level_data_version, ".txt" )
+  file_name <- stringr::str_c("dummy_minimum_extended_", person_level_data_version, ".txt" )
   minimum_extended |> readr::write_tsv(file.path(output_folder, file_name))
+
+  file_name <- stringr::str_c("dummy_birth_mother_extended_", birth_mother_level_data_version, ".txt" )
+  birth_mother_extended |> readr::write_tsv(file.path(output_folder, file_name))
+
+  file_name <- stringr::str_c("dummy_vision_extended_", vision_level_data_version, ".txt" )
+  vision_extended |> readr::write_tsv(file.path(output_folder, file_name))
 
   ParallelLogger::logInfo("Saved data")
   ParallelLogger::unregisterLogger(logger)
