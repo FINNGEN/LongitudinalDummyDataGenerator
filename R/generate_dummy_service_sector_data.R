@@ -2,7 +2,7 @@
 #' @description Generates a file with dummy data in the service sector format.
 #' @param service_sector_data_version at the moment only DF6v2 is available, Default: 'R12v2'
 #' @param n_patients number of random patients to generate, Default: 30
-#' @param n_cuts PARAM_DESCRIPTION, Default: 3
+#' @param n_cuts number of cuts to split the generation, Default: nTreaths
 #' @param seed seed used in the random processes, Default: 13
 #' @param nTreaths number of cores to use when using parallel generation, Default: (parallel::detectCores() -1)
 #' @return OUTPUT_DESCRIPTION

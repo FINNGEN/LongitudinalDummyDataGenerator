@@ -20,11 +20,13 @@ devtools::load_all(".")
 output_folder <- "../output_dummy_generator/"
 ```
 
+
+
 # Generate service sector dummy data
 
 ```{r}
-service_sector_data_version = "R11v1"
-person_level_data_version="R11v1"
+service_sector_data_version = "R12v1"
+person_level_data_version="R12v1"
 n_patients_minimum <- 5000
 ```
 
@@ -153,35 +155,3 @@ service_sector_visits |>
   facet_grid(SOURCE~., scales = "free_y")+
     theme(legend.position="bottom")
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
