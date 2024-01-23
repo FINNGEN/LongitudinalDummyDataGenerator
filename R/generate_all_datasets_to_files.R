@@ -11,6 +11,7 @@
 #' @param per_patients_service_sector Proportion of patients relative to n_patients_minimum to generate service sector data from  (default: 0.99).
 #' @param seed Seed value for random number generation (default: 13).
 #' @param nTreaths Number of threads for parallel processing (default: parallel::detectCores() - 2).
+#' @param n_cuts number of cuts to split the generation, Default: nTreaths (default: nTreaths).
 #' @importFrom ParallelLogger createLogger logInfo unregisterLogger createFileAppender layoutTimestamp
 #' @importFrom stringr str_c
 #' @importFrom readr write_tsv
