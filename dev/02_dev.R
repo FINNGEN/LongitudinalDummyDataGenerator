@@ -15,6 +15,7 @@ usethis::use_package( "lubridate")
 usethis::use_package( "ParallelLogger")
 usethis::use_package( "scales")
 usethis::use_package( "slider")
+usethis::use_package( "rlang")
 
 
 

@@ -117,26 +117,63 @@ for(folder in summary_data_folders){
 
 
   #
-  # COVARIATES DATA
+  # BIRTH MOTHER DATA
   #
-  if(dir.exists(file.path(summary_data_path, folder, "covariates"))){
-    ## covariates scanreport
+  if(dir.exists(file.path(summary_data_path, folder, "birth"))){
+    ## birth_mother scan report
 
     col_types = cols(
       .default = col_character()
     )
 
-    ScanReport_covaraites <- read_csv(
-      file.path(summary_data_path, folder, "covariates", "ScanReport_covaraites.csv"),
-                                      col_types = col_types)
+    ScanReport_birth_mother <- read_csv(
+      file.path(summary_data_path, folder, "birth", "ScanReport_birth_mother.csv"),
+      col_types = col_types)
 
-    ScanReport_covaraites <- ScanReport_covaraites |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+    ScanReport_birth_mother <- ScanReport_birth_mother |> mutate_at(vars(starts_with("Frequency...")), as.integer)
 
-    summary_data_versions_list[[folder]]<- list(covariates=list(ScanReport_covaraites = ScanReport_covaraites ))
+    summary_data_versions_list[[folder]][["birth_mother"]]<- list(ScanReport_birth_mother=ScanReport_birth_mother)
 
   }
 
+  #
+  # VISION DATA
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "vision"))){
+    ## vision scan report
 
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_vision <- read_csv(
+      file.path(summary_data_path, folder, "vision", "ScanReport_vision.csv"),
+      col_types = col_types)
+
+    ScanReport_vision <- ScanReport_vision |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]][["vision"]] = list(ScanReport_vision=ScanReport_vision)
+
+  }
+
+  #
+  # MINIMUM DATA
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "minimum"))){
+    ## minimum scanreport
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_minimum <- read_csv(
+      file.path(summary_data_path, folder, "minimum", "ScanReport_minimum.csv"),
+      col_types = col_types)
+
+    ScanReport_minimum <- ScanReport_minimum |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]][["minimum"]] = list(ScanReport_minimum=ScanReport_minimum)
+  }
 
 
 }

@@ -1,7 +1,15 @@
 
-
-
-
+#' Convert Scan Report to Tibble
+#'
+#' Converts a scan report from WaitRabit to a tibble with specified number of rows.
+#'
+#' @param scan_report The scan report data frame.
+#' @param n_rows Number of rows for the resulting tibble.
+#' @importFrom tibble tibble
+#' @importFrom stringr str_c str_pad
+#' @importFrom dplyr select filter bind_cols
+#' @importFrom rlang sym
+#' @export
 scanReportToTibble <- function(scan_report, n_rows) {
 
   res_tibble <- tibble::tibble(FINNGENID = stringr::str_c("FG", stringr::str_pad((1:n_rows), width = 8, pad = "0")))

@@ -4,8 +4,6 @@
 .httr-oauth
 .DS_Store
 
-*.tsv
+#*.tsv
 inst/doc
-
-
 output_dummy_generator/*

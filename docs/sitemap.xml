@@ -4,10 +4,7 @@
     <loc>/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/articles/Dummy_data_overview.html</loc>
+    <loc>/articles/Created_dummy_data_overview.html</loc>
   </url>
   <url>
     <loc>/articles/create_dummy_data.html</loc>
@@ -34,10 +31,19 @@
     <loc>/reference/generate_dummy_minimum_extended_data.html</loc>
   </url>
   <url>
+    <loc>/reference/generate_dummy_mothers_birth_register_data.html</loc>
+  </url>
+  <url>
     <loc>/reference/generate_dummy_service_sector_data.html</loc>
   </url>
   <url>
+    <loc>/reference/generate_dummy_vision_register_data.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/scanReportToTibble.html</loc>
   </url>
   <url>
     <loc>/reference/summary_data_versions_list.html</loc>

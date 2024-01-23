@@ -5,14 +5,14 @@
 \title{generate_dummy_minimum_extended_data}
 \usage{
 generate_dummy_minimum_extended_data(
-  person_level_data_version = "R10v1",
+  person_level_data_version = "R12v1",
   n_patients_minimum = 100,
   seed = 13,
   service_sector_data = NULL
 )
 }
 \arguments{
-\item{person_level_data_version}{PARAM_DESCRIPTION, Default: 'R10v1'}
+\item{person_level_data_version}{PARAM_DESCRIPTION, Default: 'R12v1'}
 
 \item{n_patients_minimum}{PARAM_DESCRIPTION, Default: 100}
 

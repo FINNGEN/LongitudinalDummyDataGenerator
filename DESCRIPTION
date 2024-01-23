@@ -1,6 +1,6 @@
 Package: LongitudinalDummyDataGenerator
 Title: Longitudinal Dummy Data Generator
-Version: 3.1.0
+Version: 3.2.0
 Authors@R: 
     person(given = "Javier",
            family = "Gracia-Tabuenca",
@@ -9,7 +9,7 @@ Authors@R:
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: Creates Longitudinal Dummy data from summary
     statiscics
-License: MIT + file LICENSE
+License: none
 Encoding: UTF-8
 Language: en
 LazyData: true
@@ -25,7 +25,8 @@ Imports:
     scales,
     purrr,
     tidyr,
-    slider
+    slider,
+    rlang
 Depends: 
     R (>= 2.10)
 Suggests: 
