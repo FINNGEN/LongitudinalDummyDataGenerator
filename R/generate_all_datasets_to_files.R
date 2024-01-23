@@ -24,7 +24,8 @@ generate_all_dummy_data_to_files<-function(
     n_patients_minimum = 100,
     per_patients_service_sector = 0.99,
     seed = 13,
-    nTreaths=(parallel::detectCores() -2)
+    nTreaths=(parallel::detectCores() -2),
+    n_cuts = nTreaths
 ){
 
 
@@ -53,7 +54,7 @@ generate_all_dummy_data_to_files<-function(
   service_sector_data <- generate_dummy_service_sector_data(
     service_sector_data_version=service_sector_data_version,
     n_patients = n_patients_service_sector,
-    n_cuts = nTreaths,
+    n_cuts = n_cuts,
     seed = seed,
     nTreaths = nTreaths
   )
