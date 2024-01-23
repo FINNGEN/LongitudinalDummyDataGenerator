@@ -6,8 +6,10 @@
 \usage{
 generate_all_dummy_data_to_files(
   output_folder,
-  service_sector_data_version = "R10v2",
-  person_level_data_version = "R10v1",
+  service_sector_data_version = "R112v1",
+  person_level_data_version = "R12v1",
+  birth_mother_level_data_version = "R12v1",
+  vision_level_data_version = "R12v1",
   n_patients_minimum = 100,
   per_patients_service_sector = 0.99,
   seed = 13,
@@ -19,7 +21,7 @@ generate_all_dummy_data_to_files(
 
 \item{service_sector_data_version}{Version of the service sector data (default: "R10v2").}
 
-\item{person_level_data_version}{Version of the person level data (default: "R10v1").}
+\item{person_level_data_version}{Version of the person level data (default: "R12v1").}
 
 \item{n_patients_minimum}{Number of patients to generate (default: 100).}
 

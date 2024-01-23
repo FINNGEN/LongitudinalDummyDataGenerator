@@ -5,7 +5,7 @@
 \title{generate_dummy_service_sector_data}
 \usage{
 generate_dummy_service_sector_data(
-  service_sector_data_version = "R10v2",
+  service_sector_data_version = "R12v1",
   n_patients = 30,
   n_cuts = nTreaths,
   seed = 13,
@@ -13,7 +13,7 @@ generate_dummy_service_sector_data(
 )
 }
 \arguments{
-\item{service_sector_data_version}{at the moment only DF6v2 is available, Default: 'R10v2'}
+\item{service_sector_data_version}{at the moment only DF6v2 is available, Default: 'R12v2'}
 
 \item{n_patients}{number of random patients to generate, Default: 30}
 

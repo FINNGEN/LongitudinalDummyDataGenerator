@@ -6,13 +6,13 @@
 \usage{
 .generate_dummy_service_sector_data(
   par_parameters = list(n_patients = 30, n_patients_offset = 0, seed = 13),
-  service_sector_data_version = "R10v2"
+  service_sector_data_version = "R12v1"
 )
 }
 \arguments{
 \item{par_parameters}{PARAM_DESCRIPTION, Default: list(n_patients = 30, n_patients_offset = 0, seed = 13)}
 
-\item{service_sector_data_version}{PARAM_DESCRIPTION, Default: 'R10v2'}
+\item{service_sector_data_version}{PARAM_DESCRIPTION, Default: 'R12v2'}
 }
 \value{
 OUTPUT_DESCRIPTION

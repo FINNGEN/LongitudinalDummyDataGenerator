@@ -16,7 +16,7 @@
 #' @importFrom stringr str_c
 #' @importFrom scales number
 generate_dummy_service_sector_data<-function(
-    service_sector_data_version="R12v2",
+    service_sector_data_version="R12v1",
     n_patients=30,
     n_cuts=nTreaths,
     seed=13,
@@ -110,7 +110,7 @@ generate_dummy_service_sector_data<-function(
       n_patients_offset = 0,
       seed = 13
     ),
-    service_sector_data_version = "R12v2"
+    service_sector_data_version = "R12v1"
 ){
 
   n_patients <- par_parameters$n_patients

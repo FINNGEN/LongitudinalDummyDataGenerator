@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">LongitudinalDummyDataGenerator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.2.0</span>
       </span>
     </div>
 
@@ -51,7 +51,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/Created_dummy_data_overview.html">Dummy data overview</a>
+      <a href="articles/Create_dummy_data.html">Dummy data overview</a>
     </li>
   </ul>
 </li>
@@ -85,14 +85,8 @@
 <div class="section level2">
 <h2 id="run">Run<a class="anchor" aria-label="anchor" href="#run"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">LongitudinalDummyDataGenerator</span><span class="fu">::</span><span class="fu"><a href="reference/generate_dummy_service_sector_data.html">generate_dummy_service_sector_data</a></span><span class="op">(</span></span>
-<span>    output_folder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="co"># directory where to ouput the data </span></span>
-<span>    longitudinal_data_version <span class="op">=</span> <span class="st">"DF10v2"</span>, <span class="co">#at the moment only DF10v2 is avalilable</span></span>
-<span>    n_patients <span class="op">=</span> <span class="fl">100</span>, <span class="co"># number of random patients to genenrate </span></span>
-<span>    seed <span class="op">=</span> <span class="fl">13</span>, <span class="co"># seed used in the random processes </span></span>
-<span>    nTreaths <span class="op">=</span> <span class="fl">3</span> <span class="co"># number of cores to use when using paraller generation </span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<p><code>{r} service_sector_data_version = "R11v2" person_level_data_version="R11v1" n_patients_minimum &lt;- 3000</code></p>
+<p><code>{r, eval=FALSE} tictoc::tic() LongitudinalDummyDataGenerator::generate_all_dummy_data_to_files(   output_folder = output_folder,   service_sector_data_version = service_sector_data_version,   person_level_data_version = person_level_data_version,   n_patients_minimum = n_patients_minimum,   seed = 13,   nTreaths=(parallel::detectCores() -2) ) tictoc::toc()</code></p>
 </div>
 <div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
