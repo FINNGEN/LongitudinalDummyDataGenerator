@@ -166,13 +166,13 @@ for(folder in summary_data_folders){
       .default = col_character()
     )
 
-    ScanReport_vision <- read_csv(
+    ScanReport_kidney <- read_csv(
       file.path(summary_data_path, folder, "kidney", "ScanReport_kidney.csv"),
       col_types = col_types)
 
-    ScanReport_vision <- ScanReport_vision |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+    ScanReport_kidney <- ScanReport_kidney |> mutate_at(vars(starts_with("Frequency...")), as.integer)
 
-    summary_data_versions_list[[folder]][["kidney"]] = list(ScanReport_vision=ScanReport_vision)
+    summary_data_versions_list[[folder]][["kidney"]] = list(ScanReport_kidney=ScanReport_kidney)
 
   }
 
