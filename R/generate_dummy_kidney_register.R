@@ -49,7 +49,7 @@ generate_dummy_kidney_register_data <- function(
 
   ## Generate some random rows for tracking
   # Repeat for some 100 sample tracking age and some variable changes
-  sampled_ids <- sample(unique(kidney_data$FINNGENID[kidney_data$START_YEAR >= 1999 & kidney_data$START_YEAR < 2021]), 200)
+  sampled_ids <- sample(unique(kidney_data$FINNGENID[kidney_data$START_YEAR >= 1999 & kidney_data$START_YEAR < 2021]), 50)
   kidney_data_sampled <- kidney_data |>
     dplyr::filter(FINNGENID %in% sampled_ids)
 
@@ -119,7 +119,7 @@ generate_dummy_kidney_register_data <- function(
   # Select kidney data samples that have no tracking
   sampled_ids <- sample(unique(kidney_data$FINNGENID[kidney_data$START_YEAR >= 1999 &
                                                      kidney_data$START_YEAR < 2021 &
-                                                     is.na(kidney_data$APPROX_END_DATE_OF_TRACKING)]), 50)
+                                                     is.na(kidney_data$APPROX_END_DATE_OF_TRACKING)]), 20)
   kidney_data_sampled <- kidney_data |>
     dplyr::filter(FINNGENID %in% sampled_ids)
 
