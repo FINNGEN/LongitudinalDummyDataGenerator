@@ -20,6 +20,7 @@ generate_all_dummy_data_to_files<-function(
     output_folder,
     service_sector_data_version="R112v1",
     person_level_data_version="R12v1",
+    kidney_level_data_version = "R12v1",
     birth_mother_level_data_version="R12v1",
     vision_level_data_version="R12v1",
     n_patients_minimum = 100,
@@ -74,6 +75,17 @@ generate_all_dummy_data_to_files<-function(
   )
 
   #
+  # generate kidney level data
+  #
+  ParallelLogger::logInfo("Generate kidney level data")
+
+  kidney_extended <- generate_dummy_kidney_register_data(
+    kidney_level_data_version = kidney_level_data_version,
+    n_patients_minimum = n_patients_minimum,
+    seed = seed
+  )
+
+  #
   # generate birth mother level data
   #
   ParallelLogger::logInfo("Generate birth mother level data")
@@ -106,6 +118,9 @@ generate_all_dummy_data_to_files<-function(
 
   file_name <- stringr::str_c("dummy_minimum_extended_", person_level_data_version, ".txt" )
   minimum_extended |> readr::write_tsv(file.path(output_folder, file_name))
+
+  file_name <- stringr::str_c("dummy_kidney_extended_", vision_level_data_version, ".txt" )
+  kidney_extended |> readr::write_tsv(file.path(output_folder, file_name))
 
   file_name <- stringr::str_c("dummy_birth_mother_extended_", birth_mother_level_data_version, ".txt" )
   birth_mother_extended |> readr::write_tsv(file.path(output_folder, file_name))
