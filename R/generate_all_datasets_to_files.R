@@ -23,6 +23,7 @@ generate_all_dummy_data_to_files<-function(
     kidney_level_data_version = "R12v1",
     birth_mother_level_data_version="R12v1",
     vision_level_data_version="R12v1",
+    kanta_prescription_level_data_version="R12v1",
     n_patients_minimum = 100,
     per_patients_service_sector = 0.99,
     seed = 13,
@@ -109,6 +110,18 @@ generate_all_dummy_data_to_files<-function(
     seed = seed
   )
 
+  #
+  # generate kanta prescription level data
+  #
+  ParallelLogger::logInfo("Generate kanta prescription level data")
+
+  kanta_prescription <- generate_dummy_kanta_prescription_data(
+    kanta_prescription_level_data_version = kanta_prescription_level_data_version,
+    n_patients_minimum = n_patients_minimum,
+    seed = seed,
+    kanta_medication_delivery = kanta_medication_delivery
+  )
+
 
   ## SAVE
   ParallelLogger::logInfo("Save data in ", output_folder)
@@ -127,6 +140,9 @@ generate_all_dummy_data_to_files<-function(
 
   file_name <- stringr::str_c("dummy_vision_extended_", vision_level_data_version, ".txt" )
   vision_extended |> readr::write_tsv(file.path(output_folder, file_name))
+
+  file_name <- stringr::str_c("dummy_kanta_prescription_", vision_level_data_version, ".txt" )
+  kanta_prescription |> readr::write_tsv(file.path(output_folder, file_name))
 
   ParallelLogger::logInfo("Saved data")
   ParallelLogger::unregisterLogger(logger)
