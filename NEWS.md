@@ -1,3 +1,7 @@
+# LongitudinalDummyDataGenerator 3.3.0
+
+- added kanta medication delivery register
+
 # LongitudinalDummyDataGenerator 3.2.0
 
 - Upadate to df12
