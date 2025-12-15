@@ -1,3 +1,7 @@
+# LongitudinalDummyDataGenerator 3.3.1
+
+- added kanta prescription register 
+
 # LongitudinalDummyDataGenerator 3.3.0
 
 - added kanta medication delivery register

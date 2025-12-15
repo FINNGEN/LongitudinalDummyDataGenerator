@@ -17,7 +17,7 @@ generate_dummy_service_sector_data(
 
 \item{n_patients}{number of random patients to generate, Default: 30}
 
-\item{n_cuts}{PARAM_DESCRIPTION, Default: 3}
+\item{n_cuts}{number of cuts to split the generation, Default: nTreaths}
 
 \item{seed}{seed used in the random processes, Default: 13}
 
