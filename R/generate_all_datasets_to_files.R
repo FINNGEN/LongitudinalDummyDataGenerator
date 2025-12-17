@@ -25,6 +25,7 @@ generate_all_dummy_data_to_files<-function(
     kanta_medication_delivery_level_data_version="R12v1",
     vision_level_data_version="R12v1",
     kanta_prescription_level_data_version="R12v1",
+    hla_imputed_level_data_version="R12v1",
     n_patients_minimum = 100,
     per_patients_service_sector = 0.99,
     seed = 13,
@@ -135,6 +136,16 @@ generate_all_dummy_data_to_files<-function(
     kanta_medication_delivery = kanta_medication_delivery
   )
 
+  #
+  # generate HLA imputed level data
+  #
+  ParallelLogger::logInfo("Generate HLA imputed level data")
+
+  hla_imputed <- generate_dummy_hla_imputed_data(
+    hla_imputed_level_data_version = hla_imputed_level_data_version,
+    n_patients_minimum = n_patients_minimum,
+    seed = seed
+  )
 
   ## SAVE
   ParallelLogger::logInfo("Save data in ", output_folder)
@@ -157,8 +168,11 @@ generate_all_dummy_data_to_files<-function(
   file_name <- stringr::str_c("dummy_vision_", vision_level_data_version, ".txt" )
   vision_data |> readr::write_tsv(file.path(output_folder, file_name))
 
-  file_name <- stringr::str_c("dummy_kanta_prescription_", vision_level_data_version, ".txt" )
+  file_name <- stringr::str_c("dummy_kanta_prescription_", kanta_prescription_level_data_version, ".txt" )
   kanta_prescription |> readr::write_tsv(file.path(output_folder, file_name))
+
+  file_name <- stringr::str_c("dummy_hla_imputed_", hla_imputed_level_data_version, ".txt" )
+  hla_imputed |> readr::write_tsv(file.path(output_folder, file_name))
 
   ParallelLogger::logInfo("Saved data")
   ParallelLogger::unregisterLogger(logger)
