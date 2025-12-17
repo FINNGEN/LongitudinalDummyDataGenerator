@@ -8,12 +8,16 @@ generate_all_dummy_data_to_files(
   output_folder,
   service_sector_data_version = "R112v1",
   person_level_data_version = "R12v1",
+  kidney_level_data_version = "R12v1",
   birth_mother_level_data_version = "R12v1",
+  kanta_medication_delivery_level_data_version = "R12v1",
   vision_level_data_version = "R12v1",
+  kanta_prescription_level_data_version = "R12v1",
   n_patients_minimum = 100,
   per_patients_service_sector = 0.99,
   seed = 13,
-  nTreaths = (parallel::detectCores() - 2)
+  nTreaths = (parallel::detectCores() - 2),
+  n_cuts = nTreaths
 )
 }
 \arguments{
@@ -30,6 +34,8 @@ generate_all_dummy_data_to_files(
 \item{seed}{Seed value for random number generation (default: 13).}
 
 \item{nTreaths}{Number of threads for parallel processing (default: parallel::detectCores() - 2).}
+
+\item{n_cuts}{number of cuts to split the generation, Default: nTreaths (default: nTreaths).}
 }
 \description{
 Generates dummy data for service sector and person level data in the

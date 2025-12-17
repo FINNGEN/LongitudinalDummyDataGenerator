@@ -214,6 +214,25 @@ for(folder in summary_data_folders){
     summary_data_versions_list[[folder]][["minimum"]] = list(ScanReport_minimum=ScanReport_minimum)
   }
 
+  #
+  # KANTA PRESCRIPTION
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "kanta_prescription"))){
+    ## minimum scanreport
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_kanta_prescription <- read_csv(
+      file.path(summary_data_path, folder, "kanta_prescription", "ScanReport_kanta_prescription.csv"),
+      col_types = col_types)
+
+    ScanReport_kanta_prescription <- ScanReport_kanta_prescription |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]][["kanta_prescription"]] = list(ScanReport_kanta_prescription=ScanReport_kanta_prescription)
+  }
+
 
 }
 
