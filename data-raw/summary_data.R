@@ -233,6 +233,23 @@ for(folder in summary_data_folders){
     summary_data_versions_list[[folder]][["kanta_prescription"]] = list(ScanReport_kanta_prescription=ScanReport_kanta_prescription)
   }
 
+  #
+  # HLA Imputed
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "hla_imputed"))){
+    ## minimum scanreport
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_hla_imputed <- read_csv(
+      file.path(summary_data_path, folder, "hla_imputed", "Allele_HLA_counts.csv"),
+      col_types = col_types)
+
+    summary_data_versions_list[[folder]][["hla_imputed"]] = list(ScanReport_hla_imputed=ScanReport_hla_imputed)
+  }
+
 
 }
 

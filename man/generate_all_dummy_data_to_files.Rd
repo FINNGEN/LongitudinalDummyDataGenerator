@@ -13,6 +13,7 @@ generate_all_dummy_data_to_files(
   kanta_medication_delivery_level_data_version = "R12v1",
   vision_level_data_version = "R12v1",
   kanta_prescription_level_data_version = "R12v1",
+  hla_imputed_level_data_version = "R12v1",
   n_patients_minimum = 100,
   per_patients_service_sector = 0.99,
   seed = 13,
