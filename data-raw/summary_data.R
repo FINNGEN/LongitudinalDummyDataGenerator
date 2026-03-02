@@ -218,7 +218,7 @@ for(folder in summary_data_folders){
   # KANTA PRESCRIPTION
   #
   if(dir.exists(file.path(summary_data_path, folder, "kanta_prescription"))){
-    ## minimum scanreport
+    ## Kanta prescription scanreport
 
     col_types = cols(
       .default = col_character()
@@ -237,7 +237,7 @@ for(folder in summary_data_folders){
   # HLA Imputed
   #
   if(dir.exists(file.path(summary_data_path, folder, "hla_imputed"))){
-    ## minimum scanreport
+    ## hla imputed scanreport
 
     col_types = cols(
       .default = col_character()
@@ -248,6 +248,25 @@ for(folder in summary_data_folders){
       col_types = col_types)
 
     summary_data_versions_list[[folder]][["hla_imputed"]] = list(ScanReport_hla_imputed=ScanReport_hla_imputed)
+  }
+
+  #
+  # Vaccination
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "vaccination"))){
+    ## vaccination scanreport
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_vaccination <- read_csv(
+      file.path(summary_data_path, folder, "vaccination", "ScanReport_vaccination.csv"),
+      col_types = col_types)
+
+    ScanReport_vaccination <- ScanReport_vaccination |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]][["vaccination"]] = list(ScanReport_vaccination=ScanReport_vaccination)
   }
 
 

@@ -26,6 +26,7 @@ generate_all_dummy_data_to_files<-function(
     vision_level_data_version="R12v1",
     kanta_prescription_level_data_version="R12v1",
     hla_imputed_level_data_version="R12v1",
+    vaccination_level_data_version="R12v1",
     n_patients_minimum = 100,
     per_patients_service_sector = 0.99,
     seed = 13,
@@ -147,6 +148,19 @@ generate_all_dummy_data_to_files<-function(
     seed = seed
   )
 
+  #
+  # generate vaccination level data
+  #
+  ParallelLogger::logInfo("Generate vaccination level data")
+
+  vaccination <- generate_dummy_vaccination_data(
+    vaccination_level_data_version = vaccination_level_data_version,
+    n_patients_minimum = n_patients_minimum,
+    seed = seed,
+    service_sector_data = service_sector_data,
+    kanta_medication_delivery = kanta_medication_delivery
+  )
+
   ## SAVE
   ParallelLogger::logInfo("Save data in ", output_folder)
 
@@ -173,6 +187,9 @@ generate_all_dummy_data_to_files<-function(
 
   file_name <- stringr::str_c("dummy_hla_imputed_", hla_imputed_level_data_version, ".txt" )
   hla_imputed |> readr::write_tsv(file.path(output_folder, file_name))
+
+  file_name <- stringr::str_c("dummy_vaccination_", vaccination_level_data_version, ".txt" )
+  vaccination |> readr::write_tsv(file.path(output_folder, file_name))
 
   ParallelLogger::logInfo("Saved data")
   ParallelLogger::unregisterLogger(logger)
