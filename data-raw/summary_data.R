@@ -234,6 +234,25 @@ for(folder in summary_data_folders){
   }
 
   #
+  # OTHER DRUGS
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "other_drugs"))){
+    ## other drugs scanreport
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_other_drugs <- read_csv(
+      file.path(summary_data_path, folder, "other_drugs", "ScanReport_other_drugs.csv"),
+      col_types = col_types)
+
+    ScanReport_other_drugs <- ScanReport_other_drugs |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]][["other_drugs"]] = list(ScanReport_other_drugs=ScanReport_other_drugs)
+  }
+
+  #
   # HLA Imputed
   #
   if(dir.exists(file.path(summary_data_path, folder, "hla_imputed"))){
