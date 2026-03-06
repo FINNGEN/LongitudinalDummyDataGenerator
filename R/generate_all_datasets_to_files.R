@@ -173,6 +173,18 @@ generate_all_dummy_data_to_files<-function(
     kanta_medication_delivery = kanta_medication_delivery
   )
 
+  #
+  # generate spirometry level data
+  #
+  ParallelLogger::logInfo("Generate spirometry level data")
+
+  spirometry <- generate_dummy_spirometry_data(
+    spirometry_level_data_version = spirometry_level_data_version,
+    n_patients_minimum = n_patients_minimum,
+    seed = seed,
+    minimum_extended = minimum_extended
+  )
+
   ## SAVE
   ParallelLogger::logInfo("Save data in ", output_folder)
 
@@ -205,6 +217,9 @@ generate_all_dummy_data_to_files<-function(
 
   file_name <- stringr::str_c("dummy_vaccination_", vaccination_level_data_version, ".txt" )
   vaccination |> readr::write_tsv(file.path(output_folder, file_name))
+
+  file_name <- stringr::str_c("dummy_spirometry_", spirometry_level_data_version, ".txt" )
+  spirometry |> readr::write_tsv(file.path(output_folder, file_name))
 
   ParallelLogger::logInfo("Saved data")
   ParallelLogger::unregisterLogger(logger)
