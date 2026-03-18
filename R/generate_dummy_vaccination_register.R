@@ -35,13 +35,15 @@ generate_dummy_vaccination_data <- function(
   vaccination_tables <- summary_data_versions_list[[vaccination_level_data_version]]
   vaccination_data <- scanReportToTibble(vaccination_tables$vaccination$ScanReport_vaccination, n_patients_minimum)
 
-  if(!is.null(service_sector_data) & !is.null(kanta_medication_delivery_data) & !is.null(kanta_prescriptio)){
+  if(!is.null(service_sector_data) & !is.null(kanta_medication_delivery_data)){
 
     # Filter for IDs in vaccination to that of service sector and kanta medication delivery data
     kanta_medication_delivery <- kanta_medication_delivery_data |>
-      dplyr::filter(FINNGENID %in% vaccination_data$FINNGENID)
+      dplyr::filter(FINNGENID %in% vaccination_data$FINNGENID) |>
+      dplyr::mutate(APPROX_EVENT_DAY = as.character(APPROX_EVENT_DAY))
     service_sector <- service_sector_data |>
-      dplyr::filter(SOURCE == "PURCH" & FINNGENID %in% kanta_medication_delivery$FINNGENID)
+      dplyr::filter(SOURCE == "PURCH" & FINNGENID %in% kanta_medication_delivery$FINNGENID) |>
+      dplyr::mutate(APPROX_EVENT_DAY = as.character(APPROX_EVENT_DAY))
 
     # Add 10 random events into vaccination data from Kanta medication delivery so as to match exact date and ATC
     kanta_medication_delivery_sample <- kanta_medication_delivery |>
