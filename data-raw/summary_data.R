@@ -307,6 +307,25 @@ for(folder in summary_data_folders){
     summary_data_versions_list[[folder]][["spirometry"]] = list(ScanReport_spirometry=ScanReport_spirometry)
   }
 
+  #
+  # covariates
+  #
+  if(dir.exists(file.path(summary_data_path, folder, "covariates"))){
+    ## covariates scanreport
+
+    col_types = cols(
+      .default = col_character()
+    )
+
+    ScanReport_covariates <- read_csv(
+      file.path(summary_data_path, folder, "covariates", "ScanReport_covariates.csv"),
+      col_types = col_types)
+
+    ScanReport_covariates <- ScanReport_covariates |> mutate_at(vars(starts_with("Frequency...")), as.integer)
+
+    summary_data_versions_list[[folder]][["covariates"]] = list(ScanReport_covariates=ScanReport_covariates)
+  }
+
 
 }
 
