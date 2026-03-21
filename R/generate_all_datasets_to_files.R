@@ -28,6 +28,7 @@ generate_all_dummy_data_to_files<-function(
     other_drugs_level_data_version="R12v1",
     hla_imputed_level_data_version="R12v1",
     vaccination_level_data_version="R12v1",
+    covariates_level_data_version="R12v1",
     n_patients_minimum = 100,
     per_patients_service_sector = 0.99,
     seed = 13,
@@ -185,6 +186,18 @@ generate_all_dummy_data_to_files<-function(
     minimum_extended = minimum_extended
   )
 
+  #
+  # generate covariates level data
+  #
+  ParallelLogger::logInfo("Generate covariates level data")
+
+  covariates <- generate_dummy_covariates_data(
+    covariates_level_data_version = covariates_level_data_version,
+    n_patients_minimum = n_patients_minimum*30,
+    seed = seed,
+    minimum_extended = minimum_extended
+  )
+
   ## SAVE
   ParallelLogger::logInfo("Save data in ", output_folder)
 
@@ -220,6 +233,9 @@ generate_all_dummy_data_to_files<-function(
 
   file_name <- stringr::str_c("dummy_spirometry_", spirometry_level_data_version, ".txt" )
   spirometry |> readr::write_tsv(file.path(output_folder, file_name))
+
+  file_name <- stringr::str_c("dummy_covariates_", spirometry_level_data_version, ".txt" )
+  covariates |> readr::write_tsv(file.path(output_folder, file_name))
 
   ParallelLogger::logInfo("Saved data")
   ParallelLogger::unregisterLogger(logger)

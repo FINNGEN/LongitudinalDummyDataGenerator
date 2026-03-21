@@ -1,5 +1,5 @@
 
-#' @title generate_dummy_covariates_date
+#' @title generate_dummy_covariates_data
 #' @description FUNCTION_DESCRIPTION
 #' @param covariates_level_data_version PARAM_DESCRIPTION, Default: 'R12v1'
 #' @param n_patients_minimum PARAM_DESCRIPTION, Default: 100
@@ -8,9 +8,9 @@
 #' @param minimum_extended PARAM_DESCRIPTION, Default: NULL
 #' @return list of created tables
 #' @export
-#' @importFrom dplyr mutate arrange desc distinct transmute left_join if_else select coalesce
+#' @importFrom dplyr mutate arrange desc distinct transmute left_join if_else select coalesce across starts_with
 #' @importFrom lubridate as_date dyears make_date days year
-generate_dummy_covariates_register_data <- function(
+generate_dummy_covariates_data <- function(
     covariates_level_data_version="R12v1",
     n_patients_minimum = 3000,
     seed=13,
@@ -26,7 +26,8 @@ generate_dummy_covariates_register_data <- function(
   covariates_tables <- summary_data_versions_list[[covariates_level_data_version]]
   covariates_data <- scanReportToTibble(covariates_tables$covariates$ScanReport_covariates, n_patients_minimum)
 
-  # Replace BL_YEAR, BL_AGE, SEX, DEATH, DEATH_FU_AGE and AGE_AT_DEATH_OR_END_OF_FOLLOWUP columns from minimum_extended
+  # Replace BL_YEAR, BL_AGE, SEX, DEATH, DEATH_FU_AGE,  AGE_AT_DEATH_OR_END_OF_FOLLOWUP,  AGE_AT_DEATH_OR_END_OF_FOLLOWUP and APPROX_BIRTH_DATE columns from minimum_extended
+  # Fill out all NA columns that are double with 0 which are SEXAGE and PC1-PC20
   if(!is.null(minimum_extended)){
 
     minimum_extended <- minimum_extended |>
@@ -35,7 +36,8 @@ generate_dummy_covariates_register_data <- function(
                     SEX = as.character(SEX),
                     DEATH = as.character(DEATH),
                     DEATH_FU_AGE = as.character(DEATH_FU_AGE),
-                    AGE_AT_DEATH_OR_END_OF_FOLLOWUP = as.character(AGE_AT_DEATH_OR_END_OF_FOLLOWUP)
+                    AGE_AT_DEATH_OR_END_OF_FOLLOWUP = as.character(AGE_AT_DEATH_OR_END_OF_FOLLOWUP),
+                    APPROX_BIRTH_DATE = as.character(APPROX_BIRTH_DATE)
                    )
 
     # Replace the columns from minimum_extended
@@ -45,8 +47,16 @@ generate_dummy_covariates_register_data <- function(
                     SEX = dplyr::coalesce(minimum_extended$SEX[match(FINNGENID, minimum_extended$FINNGENID)], SEX),
                     DEATH = dplyr::coalesce(minimum_extended$DEATH[match(FINNGENID, minimum_extended$FINNGENID)], DEATH),
                     DEATH_FU_AGE = dplyr::coalesce(minimum_extended$DEATH_FU_AGE[match(FINNGENID, minimum_extended$FINNGENID)], DEATH_FU_AGE),
-                    AGE_AT_DEATH_OR_END_OF_FOLLOWUP = dplyr::coalesce(minimum_extended$AGE_AT_DEATH_OR_END_OF_FOLLOWUP[match(FINNGENID, minimum_extended$FINNGENID)], AGE_AT_DEATH_OR_END_OF_FOLLOWUP)
-                   )
+                    AGE_AT_DEATH_OR_END_OF_FOLLOWUP = dplyr::coalesce(minimum_extended$AGE_AT_DEATH_OR_END_OF_FOLLOWUP[match(FINNGENID, minimum_extended$FINNGENID)], AGE_AT_DEATH_OR_END_OF_FOLLOWUP),
+                    AGE_AT_DEATH_OR_END_OF_FOLLOWUP2 = dplyr::coalesce(minimum_extended$AGE_AT_DEATH_OR_END_OF_FOLLOWUP[match(FINNGENID, minimum_extended$FINNGENID)], AGE_AT_DEATH_OR_END_OF_FOLLOWUP2),
+                    APPROX_BIRTH_DATE = dplyr::coalesce(minimum_extended$APPROX_BIRTH_DATE[match(FINNGENID, minimum_extended$FINNGENID)], APPROX_BIRTH_DATE)
+                   ) |>
+      dplyr::rename(FID = 1) |>
+      dplyr::mutate(IID = FID, .after = FID) |>
+      dplyr::mutate(SEXAGE = as.double(0),
+                    dplyr::across(dplyr::starts_with("PC"), ~ as.double(0))
+                    )
+
 
   }
 
