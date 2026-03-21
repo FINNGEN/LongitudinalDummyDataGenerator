@@ -193,7 +193,7 @@ generate_all_dummy_data_to_files<-function(
 
   covariates <- generate_dummy_covariates_data(
     covariates_level_data_version = covariates_level_data_version,
-    n_patients_minimum = n_patients_minimum*30,
+    n_patients_minimum = n_patients_minimum,
     seed = seed,
     minimum_extended = minimum_extended
   )
